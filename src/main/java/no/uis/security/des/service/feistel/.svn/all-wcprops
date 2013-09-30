@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/!svn/ver/2/trunk/src/main/java/no/uis/security/des/service/feistel
+END
+FeistelCipher.java
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/!svn/ver/12/trunk/src/main/java/no/uis/security/des/service/feistel/FeistelCipher.java
+END
+DESRoundFunction.java
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/!svn/ver/9/trunk/src/main/java/no/uis/security/des/service/feistel/DESRoundFunction.java
+END
+DesSubKeyGenerator.java
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/!svn/ver/9/trunk/src/main/java/no/uis/security/des/service/feistel/DesSubKeyGenerator.java
+END

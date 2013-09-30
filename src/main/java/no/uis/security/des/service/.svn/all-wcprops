@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/!svn/ver/2/trunk/src/main/java/no/uis/security/des/service
+END
+RoundFunction.java
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/!svn/ver/9/trunk/src/main/java/no/uis/security/des/service/RoundFunction.java
+END
+SubKeyGenerator.java
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/!svn/ver/9/trunk/src/main/java/no/uis/security/des/service/SubKeyGenerator.java
+END
+EncryptionService.java
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/!svn/ver/12/trunk/src/main/java/no/uis/security/des/service/EncryptionService.java
+END
