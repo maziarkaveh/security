@@ -1,4 +1,4 @@
-package no.uis.security.des.utils;
+package no.uis.security.common.utils;
 
 
 public class CypherUtils {
@@ -11,4 +11,5 @@ public class CypherUtils {
 
         return LogicalUtils.booleanArrayToByteArray(result);
     }
+
 }

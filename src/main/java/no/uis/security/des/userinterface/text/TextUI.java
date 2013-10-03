@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Scanner;
 
-import static no.uis.security.des.utils.LogicalUtils.*;
+import static no.uis.security.common.utils.LogicalUtils.*;
 
 @Service
 public class TextUI implements UI {
@@ -23,7 +23,7 @@ public class TextUI implements UI {
             byte[] text = getText(action);
             byte[] key = getKey();
             byte[] code = action.equals(Action.DECRYPT_HEX) ? feistelCipher.decrypt(text, key) : feistelCipher.encrypt(text, key);
-            System.out.printf("The %s in Hex is:%s\nAnd in Plain text is %s", action, convertBytesToStringHex(code), convertBytesToString(code));
+            System.out.printf("The %s in Hex is:%s\nAnd in Plain text is %s", action, byteArrayToStringHex(code), byteArrayToString(code));
         } catch (Exception e) {
             System.err.println("Some error occurred please try again");
             feistel();

@@ -1,7 +1,7 @@
 package no.uis.security.des.model;
 
 import no.uis.security.des.service.exceptions.ServiceValidationException;
-import no.uis.security.des.utils.LogicalUtils;
+import no.uis.security.common.utils.LogicalUtils;
 import org.apache.commons.lang.ArrayUtils;
 
 import java.util.Arrays;
@@ -106,6 +106,6 @@ public class Block implements Cloneable {
     @Override
     public String toString() {
 
-        return "Hex :" + LogicalUtils.convertBytesToStringHex(getAllBytes()) + " Bits: " + LogicalUtils.convertBytesToStringBits(getAllBytes()) + " Decimal: " + LogicalUtils.convertBytesToStringDecimal(getAllBytes()) + " ";
+        return "Hex :" + LogicalUtils.byteArrayToStringHex(getAllBytes()) + " Bits: " + LogicalUtils.byteArrayToStringBits(getAllBytes()) + " Decimal: " + LogicalUtils.byteArrayEachByteToOneStringDecimal(getAllBytes()) + " ";
     }
 }

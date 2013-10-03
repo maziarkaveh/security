@@ -2,7 +2,7 @@ package no.uis.security.des.service.feistel;
 
 import no.uis.security.des.AbstractBasicTest;
 import no.uis.security.des.service.EncryptionService;
-import no.uis.security.des.utils.LogicalUtils;
+import no.uis.security.common.utils.LogicalUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.junit.After;
 import org.junit.Assert;

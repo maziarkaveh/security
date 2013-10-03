@@ -5,7 +5,7 @@ import no.uis.security.des.service.EncryptionService;
 import no.uis.security.des.service.RoundFunction;
 import no.uis.security.des.service.SubKeyGenerator;
 import no.uis.security.des.service.exceptions.ServiceValidationException;
-import no.uis.security.des.utils.LogicalUtils;
+import no.uis.security.common.utils.LogicalUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,8 +57,8 @@ public class FeistelCipher implements EncryptionService {
 
     @Override
     public byte[] encrypt(byte[] plain, byte[] key) {
-        log.debug("plain text ={}", LogicalUtils.convertBytesToStringHex(plain));
-        log.debug("plain key ={}", LogicalUtils.convertBytesToStringHex(key));
+        log.debug("plain text ={}", LogicalUtils.byteArrayToStringHex(plain));
+        log.debug("plain key ={}", LogicalUtils.byteArrayToStringHex(key));
         Block[] keys = generateKeys(key);
         List<Byte> wholeCypher = new ArrayList<Byte>();
         for (int i = 0; i < plain.length; i += 8) {
@@ -66,7 +66,7 @@ public class FeistelCipher implements EncryptionService {
             wholeCypher.addAll(Arrays.asList(ArrayUtils.toObject(block.getAllBytes())));
         }
         byte[] all = ArrayUtils.toPrimitive(wholeCypher.toArray(new Byte[0]));
-        log.debug("cypher={}", LogicalUtils.convertBytesToStringHex(all));
+        log.debug("cypher={}", LogicalUtils.byteArrayToStringHex(all));
         return all;
     }
 
@@ -77,8 +77,8 @@ public class FeistelCipher implements EncryptionService {
 
     @Override
     public byte[] decrypt(byte[] cypher, byte[] key) {
-        log.debug("cypher text ={}", LogicalUtils.convertBytesToStringHex(cypher));
-        log.debug("cypher key ={}", LogicalUtils.convertBytesToStringHex(key));
+        log.debug("cypher text ={}", LogicalUtils.byteArrayToStringHex(cypher));
+        log.debug("cypher key ={}", LogicalUtils.byteArrayToStringHex(key));
 
         Block[] keys = generateKeys(key);
         ArrayUtils.reverse(keys);
@@ -88,7 +88,7 @@ public class FeistelCipher implements EncryptionService {
             wholeCypher.addAll(Arrays.asList(ArrayUtils.toObject(block.getAllBytes())));
         }
         byte[] all = ArrayUtils.toPrimitive(wholeCypher.toArray(new Byte[0]));
-        log.debug("plain text={}", LogicalUtils.convertBytesToStringHex(all));
+        log.debug("plain text={}", LogicalUtils.byteArrayToStringHex(all));
         return all;
     }
 

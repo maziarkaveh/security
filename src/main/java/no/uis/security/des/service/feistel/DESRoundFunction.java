@@ -2,14 +2,14 @@ package no.uis.security.des.service.feistel;
 
 import no.uis.security.des.model.Block;
 import no.uis.security.des.service.RoundFunction;
-import no.uis.security.des.utils.CypherUtils;
-import no.uis.security.des.utils.LogicalUtils;
+import no.uis.security.common.utils.CypherUtils;
+import no.uis.security.common.utils.LogicalUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import static no.uis.security.des.utils.LogicalUtils.booleanArrayToByteArray;
-import static no.uis.security.des.utils.LogicalUtils.convertBytesToStringHex;
+import static no.uis.security.common.utils.LogicalUtils.booleanArrayToByteArray;
+import static no.uis.security.common.utils.LogicalUtils.byteArrayToStringHex;
 
 
 @Service
@@ -105,7 +105,7 @@ public class DESRoundFunction implements RoundFunction {
     @Override
     public Block init(Block code) {
         Block block = new Block(CypherUtils.permute(IP, code.getAllBits()));
-        log.debug("message after IP = {}", convertBytesToStringHex(block.getAllBytes()));
+        log.debug("message after IP = {}", byteArrayToStringHex(block.getAllBytes()));
 
         return block;
     }
@@ -114,7 +114,7 @@ public class DESRoundFunction implements RoundFunction {
     @Override
     public Block inverseInit(Block code) {
         Block block = new Block(CypherUtils.permute(FP, code.getAllBits()));
-        log.debug("message after FP = {}", convertBytesToStringHex(block.getAllBytes()));
+        log.debug("message after FP = {}", byteArrayToStringHex(block.getAllBytes()));
         return block;
 
     }
@@ -123,30 +123,30 @@ public class DESRoundFunction implements RoundFunction {
     public Block generateNextLevel(Block code, Block key, int level) {
         byte[] left = code.getLeftInBytes();
         boolean[] right = code.getRight();
-        log.debug("cypher level {} left = {}", level, convertBytesToStringHex(left));
-        log.debug("cypher level {} right = {}", level, convertBytesToStringHex(code.getRightInBytes()));
+        log.debug("cypher level {} left = {}", level, byteArrayToStringHex(left));
+        log.debug("cypher level {} right = {}", level, byteArrayToStringHex(code.getRightInBytes()));
 
         byte[] l1 = CypherUtils.permute(E, right);
-        log.debug("cypher level {} after E = {}", level, convertBytesToStringHex(l1));
+        log.debug("cypher level {} after E = {}", level, byteArrayToStringHex(l1));
 
         byte[] permutedKey = CypherUtils.permute(DesSubKeyGenerator.PC2, key.getAllBits());
-        log.debug("subkey {} after PC2 = {}", level, convertBytesToStringHex(permutedKey));
+        log.debug("subkey {} after PC2 = {}", level, byteArrayToStringHex(permutedKey));
 
         byte[] l2 = LogicalUtils.exclusiveOr(l1, permutedKey);
-        log.debug("cypher level {} after xor = {}", level, convertBytesToStringHex(l2));
+        log.debug("cypher level {} after xor = {}", level, byteArrayToStringHex(l2));
 
         boolean[] l3 = substitution(l2);
-        log.debug("cypher level {} after substitution = {}", level, convertBytesToStringHex(booleanArrayToByteArray(l3)));
+        log.debug("cypher level {} after substitution = {}", level, byteArrayToStringHex(booleanArrayToByteArray(l3)));
 
         byte[] l4 = CypherUtils.permute(P, l3);
-        log.debug("cypher level {} after P = {}", level, convertBytesToStringHex(l4));
+        log.debug("cypher level {} after P = {}", level, byteArrayToStringHex(l4));
 
 
         byte[] l5 = LogicalUtils.exclusiveOr(l4, left);
-        log.debug("cypher level {} after xor by left = {}", level, convertBytesToStringHex(l5));
+        log.debug("cypher level {} after xor by left = {}", level, byteArrayToStringHex(l5));
 
         Block block = new Block(code.getRightInBytes(), l5);
-        log.debug("cypher after level {} = {}", level, convertBytesToStringHex(block.getAllBytes()));
+        log.debug("cypher after level {} = {}", level, byteArrayToStringHex(block.getAllBytes()));
 
         return block;
     }
@@ -161,7 +161,7 @@ public class DESRoundFunction implements RoundFunction {
             l += S[j][row * 16 + col];
         }
 
-        byte[] bytes = LogicalUtils.checkIfByteArrayLengthIsLessThanExpected(LogicalUtils.longToBytes(l), 4);
+        byte[] bytes = LogicalUtils.checkIfByteArrayLengthIsLessThanExpected(LogicalUtils.longToByteArray(l), 4);
         return LogicalUtils.byteArrayToBooleanArray(bytes);
 
     }

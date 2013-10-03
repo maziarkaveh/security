@@ -3,8 +3,8 @@ package no.uis.security.des.service.feistel;
 import no.uis.security.des.model.Block;
 import no.uis.security.des.service.SubKeyGenerator;
 import no.uis.security.des.service.exceptions.IllegalMethodParameterException;
-import no.uis.security.des.utils.CypherUtils;
-import no.uis.security.des.utils.LogicalUtils;
+import no.uis.security.common.utils.CypherUtils;
+import no.uis.security.common.utils.LogicalUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -43,7 +43,7 @@ public class DesSubKeyGenerator implements SubKeyGenerator {
         boolean[] rawPasswordBits = LogicalUtils.byteArrayToBooleanArray(rawPassword);
 
         byte[] permute = CypherUtils.permute(PC1, rawPasswordBits);
-        log.debug("key after PC1 = {}", LogicalUtils.convertBytesToStringHex(permute));
+        log.debug("key after PC1 = {}", LogicalUtils.byteArrayToStringHex(permute));
 
         return new Block(permute);
 
@@ -58,11 +58,11 @@ public class DesSubKeyGenerator implements SubKeyGenerator {
         boolean[] left = key.getLeft();
         boolean[] right = key.getRight();
         for (int i = 0; i < rotations[level]; i++) {
-            left = LogicalUtils.shiftArrayToLeft(left);
-            right = LogicalUtils.shiftArrayToLeft(right);
+            left = LogicalUtils.circularShiftArrayToLeft(left);
+            right = LogicalUtils.circularShiftArrayToLeft(right);
         }
         Block block = new Block(left, right);
-        log.debug("subkey level {} before PC2 = {}", level, LogicalUtils.convertBytesToStringHex(block.getAllBytes()));
+        log.debug("subkey level {} before PC2 = {}", level, LogicalUtils.byteArrayToStringHex(block.getAllBytes()));
 
         return block;
     }

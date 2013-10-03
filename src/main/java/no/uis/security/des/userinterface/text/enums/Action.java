@@ -1,7 +1,7 @@
 package no.uis.security.des.userinterface.text.enums;
 
-import static no.uis.security.des.utils.LogicalUtils.hexStringToByteArray;
-import static no.uis.security.des.utils.LogicalUtils.stringMatchesHex;
+import static no.uis.security.common.utils.LogicalUtils.hexStringToByteArray;
+import static no.uis.security.common.utils.LogicalUtils.stringMatchesHex;
 
 public enum Action {
     ENCRYPT_WITH_HEX_INPUT("encrypt with HEX input") {
