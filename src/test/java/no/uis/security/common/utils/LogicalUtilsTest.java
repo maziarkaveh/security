@@ -1,11 +1,9 @@
 package no.uis.security.common.utils;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static no.uis.security.common.utils.LogicalUtils.addOfTwoBooleanArrays;
-import static no.uis.security.common.utils.LogicalUtils.hexStringToByteArray;
+import java.security.SecureRandom;
 
 
 public class LogicalUtilsTest {
@@ -136,10 +134,11 @@ public class LogicalUtilsTest {
         assertArrayEquals(expected1, booleans);
 
     }
+
     @Test
     public void shiftArrayToLeft() {
-        boolean[] in = { true, true, false, false, false, true, false, true, false, false, false, false, true, false, false, false, true, true, true, false};
-        boolean[] expected1 = { true, false, false, false, true, false, true, false, false, false, false, true, false, false, false, true, true, true, false, false};
+        boolean[] in = {true, true, false, false, false, true, false, true, false, false, false, false, true, false, false, false, true, true, true, false};
+        boolean[] expected1 = {true, false, false, false, true, false, true, false, false, false, false, true, false, false, false, true, true, true, false, false};
         boolean[] booleans = LogicalUtils.shiftLeft(in);
         Assert.assertEquals(expected1.length, booleans.length);
         assertArrayEquals(expected1, booleans);
@@ -172,7 +171,14 @@ public class LogicalUtilsTest {
 
     @Test
     public void modInverseOfTwoBooleanArrays() {
+                BigInteger bigInteger = BigInteger.probablePrime(123,new SecureRandom());
 
+
+        boolean[] n1 = LogicalUtils.hexStringToBooleanArray("4e7452b6755a969c5d8eafe01506395");
+        boolean[] n2 = LogicalUtils.hexStringToBooleanArray("1c7469da219f1c8bab429a489068245e2f069");
+        boolean[] expected = LogicalUtils.hexStringToBooleanArray("1252a4adfab148d536cd04b5b87ff740bfdf6");
+        boolean[] actuals = LogicalUtils.modInverseOfTwoPrimeBooleanArrays(n1, n2);
+        assertArrayEquals(expected, actuals);
     }
 
     @Test
@@ -194,14 +200,17 @@ public class LogicalUtilsTest {
 
     @Test
     public void modPowOfTwoBooleanArrays() {
-
+        boolean[] n1 = LogicalUtils.hexStringToBooleanArray("f1571c947d9e8590f1571c947d9e859");
+        boolean[] n2 = LogicalUtils.hexStringToBooleanArray("23094028340980328409fbbbbbdd4324");
+        boolean[] n3 = LogicalUtils.hexStringToBooleanArray("f1571c947d9e8590f1571c947d9e859242376482364");
+        boolean[] expected = LogicalUtils.hexStringToBooleanArray("9bd4f818bc5d96e23e3a9636c9df50d570bc69cbd1");
+        boolean[] actuals = LogicalUtils.modPowOfTwoBooleanArrays(n1, n2, n3);
+        assertArrayEquals(expected, actuals);
     }
 
     @Test
     public void modOfTwoBooleanArrays() {
-//        BigInteger bigInteger = new BigInteger("f1571c947d9e8590f1571c947d9e859", 16);
-//        BigInteger bigInteger2 = new BigInteger("f1571c947d9e8590f1571c947d9e859242376482364", 16);
-//        System.out.println(bigInteger2.mod(bigInteger).toString(16));
+
         boolean[] i1 = {true, true, false, true, true};
         boolean[] i2 = {true, true, false};
         boolean[] e = {true, true};
@@ -236,12 +245,10 @@ public class LogicalUtilsTest {
 
     @Test
     public void divideOfTwoBooleanArrays() {
-//        BigInteger bigInteger = new BigInteger("f1571c947d9e8590f1571c947d9e859", 16);
-//        BigInteger bigInteger2 = new BigInteger("f1571c947d9e8590f1571c947d9e859242376482364", 16);
-//        System.out.println(bigInteger2.divide(bigInteger).toString(16));
-        boolean[] i1 = {true, true, false, true, false,true};
+
+        boolean[] i1 = {true, true, false, true, false, true};
         boolean[] i2 = {true, false, true};
-        boolean[] e = {true, false,true, false};
+        boolean[] e = {true, false, true, false};
         assertArrayEquals(e, LogicalUtils.divideOfTwoBooleanArrays(i1, i2));
 
         boolean[] n1 = LogicalUtils.hexStringToBooleanArray("f1571c947d9e8590f1571c947d9e859242376482364");
@@ -273,6 +280,18 @@ public class LogicalUtilsTest {
             n2 = LogicalUtils.addOfTwoBooleanArrays(n2, n1);
         }
         assertArrayEquals(expected, actuals);
+    }
+
+    @Test
+
+    public void powOfBooleanArray() {
+
+        boolean[] n1 = LogicalUtils.hexStringToBooleanArray("88BBE");
+        boolean[] expected = LogicalUtils.hexStringToBooleanArray("84434d6c795cf6e8a2c595181ed111d5bc63712dcbee36882e247d8e988a423fd005f97026c24bd15748fc0c61c0fb42c9504241e47d6831840eac80cc4a51fa070e04ab07187040100000000");
+        boolean[] actuals = LogicalUtils.powOfBooleanArray(n1, 32);
+        assertArrayEquals(expected, actuals);
+
+
     }
 
     @Test

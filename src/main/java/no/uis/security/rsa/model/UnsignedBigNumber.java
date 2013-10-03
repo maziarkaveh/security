@@ -58,12 +58,12 @@ public class UnsignedBigNumber implements Cloneable {
         return new UnsignedBigNumber(subtractOfTwoBooleanArrays(getValue(), number.getValue()));
     }
 
-    public UnsignedBigNumber modPow(UnsignedBigNumber number) {
-        return new UnsignedBigNumber(modPowOfTwoBooleanArrays(getValue(), number.getValue()));
+    public UnsignedBigNumber modPow(UnsignedBigNumber ex,UnsignedBigNumber n) {
+        return new UnsignedBigNumber(modPowOfTwoBooleanArrays(getValue(), ex.getValue(),n.getValue()));
     }
 
     public UnsignedBigNumber modInverse(UnsignedBigNumber number) {
-        return new UnsignedBigNumber(modInverseOfTwoBooleanArrays(getValue(), number.getValue()));
+        return new UnsignedBigNumber(modInverseOfTwoPrimeBooleanArrays(getValue(), number.getValue()));
     }
 
     public UnsignedBigNumber add(UnsignedBigNumber number) {

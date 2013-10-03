@@ -11,6 +11,9 @@ import java.util.List;
 public class LogicalUtils {
     public static final String HEX_16_DIGITS_PATTERN = "^[0-9A-Fa-f]{16}$";
     public static final String HEX_PATTERN = "^[0-9A-Fa-f]+$";
+    public static final boolean[] ONE = {true};
+    public static final boolean[] ZERO = {false};
+    public static final boolean[] TWO = {true, false};
 
     public static byte[] exclusiveOr(byte[] p1, byte[] p2) {
         if (p1.length != p2.length) {
@@ -26,13 +29,13 @@ public class LogicalUtils {
 
 
     public static String byteArrayEachByteToOneStringDecimal(byte[] bytes) {
-        String s = "";
+        StringBuffer desString = new StringBuffer();
 
         for (int i = 0; i < bytes.length; i++) {
-            s += bytes[i] + " ";
+            desString.append(bytes[i]).append(" ");
         }
 
-        return s;
+        return desString.toString();
     }
 
     public static String byteArrayToStringHex(byte[] bytes) {
@@ -119,7 +122,7 @@ public class LogicalUtils {
 
     }
 
-    public static String booleanArrayToStringHex(boolean[] value) {
+    public static String booleanArrayToStringHex(final boolean[] value) {
         return byteArrayToStringHex(booleanArrayToByteArray(value));
     }
 
@@ -178,14 +181,39 @@ public class LogicalUtils {
         return booleans;
     }
 
-    public static boolean[] modInverseOfTwoBooleanArrays(boolean[] dividend, boolean[] divisor) {
+    public static boolean[] modInverseOfTwoPrimeBooleanArrays(final boolean[] num, final boolean[] modulus) {
+        return modPowOfTwoBooleanArrays(num.clone(), subtractOfTwoBooleanArrays(modulus.clone(), TWO), modulus.clone());
+    }
+
+
+    public static boolean[] modPowOfTwoBooleanArrays(final boolean[] base, final boolean[] exponent, final boolean[] modulus) {
+        boolean[] b = base.clone();
+        boolean[] e = exponent.clone();
+        boolean[] m = modulus.clone();
+
+        boolean[] result = ONE.clone();
+        while (compareTwoBooleanArrays(e, ZERO) == 1) {
+            if (IsOddArrayBoolean(e)) {
+                result = modOfTwoBooleanArrays(multiplyOfTwoBooleanArrays(b, result), m);
+            }
+            e = shiftRight(e);
+            b = modOfTwoBooleanArrays(multiplyOfTwoBooleanArrays(b, b), m);
+        }
+        return result;
+    }
+
+    private static boolean IsOddArrayBoolean(final boolean[] exponent) {
+        return exponent[exponent.length - 1];
+    }
+
+    public static boolean[] modOfTwoBooleanArrays(final boolean[] dividend, final boolean[] divisor) {
         boolean[] dv = removeLeftFalsesFromBooleanArray(dividend);
         boolean[] dr = removeLeftFalsesFromBooleanArray(divisor);
         if (compareTwoBooleanArrays(dv, dr) == -1) {
-            return new boolean[1];
+            return dv;
         }
         if (compareTwoBooleanArrays(dv, dr) == 0) {
-            return new boolean[]{true};
+            return ONE;
         }
         boolean[] quotient = new boolean[dividend.length];
         boolean[] reminder = ArrayUtils.subarray(dv, 0, dr.length - 1);
@@ -203,40 +231,11 @@ public class LogicalUtils {
         return reminder;
     }
 
-    public static boolean[] modPowOfTwoBooleanArrays(boolean[] num1, boolean[] num2) {
-        return new boolean[0];
-    }
-
-    public static boolean[] modOfTwoBooleanArrays(boolean[] dividend, boolean[] divisor) {
-        boolean[] dv = removeLeftFalsesFromBooleanArray(dividend);
-        boolean[] dr = removeLeftFalsesFromBooleanArray(divisor);
-        if (compareTwoBooleanArrays(dv, dr) == -1) {
-            return new boolean[1];
-        }
-        if (compareTwoBooleanArrays(dv, dr) == 0) {
-            return new boolean[]{true};
-        }
-        boolean[] quotient = new boolean[dividend.length];
-        boolean[] reminder = ArrayUtils.subarray(dv, 0, dr.length - 1);
-        int j = 0;
-        for (int i = dr.length - 1; i < dv.length; i++) {
-            reminder = ArrayUtils.add(reminder, dv[i]);
-            if (compareTwoBooleanArrays(reminder, dr) == -1) {
-                quotient[j++] = false;
-                continue;
-            }
-            quotient[j++] = true;
-            reminder = subtractOfTwoBooleanArrays(reminder, dr);
-
-        }
-        return reminder;
-    }
-
-    public static boolean[] multiplyOfTwoBooleanArrays(boolean[] num1, boolean[] num2) {
+    public static boolean[] multiplyOfTwoBooleanArrays(final boolean[] num1, final boolean[] num2) {
 
         boolean[] minArray = compareTwoBooleanArrays(num1, num2) != 1 ? num1 : num2;
         boolean[] maxArray = compareTwoBooleanArrays(num1, num2) == 1 ? num1 : num2;
-        boolean[] result = new boolean[0];
+        boolean[] result = ZERO;
         for (int i = 0; i < minArray.length; i++) {
             if (minArray[minArray.length - i - 1]) {
                 boolean[] num21 = ArrayUtils.addAll(maxArray, new boolean[i]);
@@ -246,22 +245,25 @@ public class LogicalUtils {
         if (result.length % 2 == 0) {
             return result;
         }
-        return ArrayUtils.addAll(new boolean[1], result);
+        return ArrayUtils.addAll(ZERO, result);
     }
 
-    public static boolean[] subtractOfTwoBooleanArrays(boolean[] num1, boolean[] num2) {
-        if (num1.length > num2.length) {
-            num2 = ArrayUtils.addAll(new boolean[num1.length - num2.length], num2);
-        }
-        num2 = complementBooleanArray(num2);
-        boolean[] add = addOfTwoBooleanArrays(num1, num2);
+    public static boolean[] subtractOfTwoBooleanArrays(final boolean[] num1, final boolean[] num2) {
+        boolean[] n1 = num1.clone();
+        boolean[] n2 = num2.clone();
 
-        boolean[] sub = addOfTwoBooleanArrays(add, new boolean[]{true});
+        if (n1.length > n2.length) {
+            n2 = ArrayUtils.addAll(new boolean[n1.length - n2.length], n2);
+        }
+        n2 = complementBooleanArray(n2);
+        boolean[] add = addOfTwoBooleanArrays(n1, n2);
+
+        boolean[] sub = addOfTwoBooleanArrays(add, ONE);
 
         return ArrayUtils.subarray(sub, 1, sub.length);
     }
 
-    public static boolean[] complementBooleanArray(boolean[] num) {
+    public static boolean[] complementBooleanArray(final boolean[] num) {
         boolean[] result = new boolean[num.length];
         for (int i = 0; i < num.length; i++) {
             result[i] = !num[i];
@@ -269,7 +271,7 @@ public class LogicalUtils {
         return result;
     }
 
-    public static boolean[] addOfTwoBooleanArrays(boolean[] num1, boolean[] num2) {
+    public static boolean[] addOfTwoBooleanArrays(final boolean[] num1, final boolean[] num2) {
         int n1L = num1.length;
         int n2L = num2.length;
         int maxLength = Math.max(n1L, n2L);
@@ -352,7 +354,7 @@ public class LogicalUtils {
     }
 
 
-    public static boolean[] ignoreNthBitsInByteBooleanArray(boolean[] array, Integer... nth) {
+    public static boolean[] ignoreNthBitsInByteBooleanArray(final boolean[] array, Integer... nth) {
         List<Integer> nthl = Arrays.asList(nth);
         List<Boolean> result = new ArrayList<Boolean>();
         for (int i = 0; i < array.length; i++) {
@@ -361,7 +363,7 @@ public class LogicalUtils {
                 result.add(array[i]);
             }
         }
-        boolean[] resultPrimitive = new boolean[result.size()];
+        final boolean[] resultPrimitive = new boolean[result.size()];
         int i = 0;
         for (Boolean aBoolean : result) {
             resultPrimitive[i++] = aBoolean;
@@ -380,10 +382,10 @@ public class LogicalUtils {
         boolean[] dv = removeLeftFalsesFromBooleanArray(dividend);
         boolean[] dr = removeLeftFalsesFromBooleanArray(divisor);
         if (compareTwoBooleanArrays(dv, dr) == -1) {
-            return new boolean[1];
+            return ZERO;
         }
         if (compareTwoBooleanArrays(dv, dr) == 0) {
-            return new boolean[]{true};
+            return ONE;
         }
         boolean[] quotient = new boolean[dividend.length];
         boolean[] reminder = ArrayUtils.subarray(dv, 0, dr.length - 1);
@@ -435,7 +437,7 @@ public class LogicalUtils {
             return n1;
         }
 
-        return ArrayUtils.addAll(new boolean[1], ArrayUtils.subarray(n1, 0, n1.length - 1));
+        return ArrayUtils.addAll(ZERO, ArrayUtils.subarray(n1, 0, n1.length - 1));
     }
 
     public static boolean[] shiftLeft(final boolean[] n1) {
@@ -443,5 +445,20 @@ public class LogicalUtils {
             return n1;
         }
         return ArrayUtils.add(ArrayUtils.subarray(n1, 1, n1.length), false);
+    }
+
+    public static boolean[] powOfBooleanArray(final boolean[] num, int e) {
+        boolean[] result = ONE;
+        boolean[] t = num.clone();
+        while (e > 1) {
+            if (e % 2 == 1) {
+                result = multiplyOfTwoBooleanArrays(result, t);
+            }
+            e = (int) Math.floor(e / 2);
+            t = multiplyOfTwoBooleanArrays(t, t);
+        }
+        result = multiplyOfTwoBooleanArrays(result, t);
+        return result;
+
     }
 }
