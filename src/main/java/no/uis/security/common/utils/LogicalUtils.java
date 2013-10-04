@@ -1,12 +1,15 @@
 package no.uis.security.common.utils;
 
 import no.uis.security.des.service.exceptions.IllegalMethodParameterException;
+import no.uis.security.rsa.model.UnsignedBigNumber;
+import no.uis.security.rsa.service.RandomGenerator;
 import org.apache.commons.lang.ArrayUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 public class LogicalUtils {
     public static final String HEX_16_DIGITS_PATTERN = "^[0-9A-Fa-f]{16}$";
@@ -91,7 +94,19 @@ public class LogicalUtils {
     }
 
     public static boolean[] longToBooleanArray(long l) {
-        return byteArrayToBooleanArray(longToByteArray(l));
+        boolean[] result = new boolean[64];
+        for (int i = 0; i < 64; i++) {
+            result[63 - i] = (l & (1l << (i))) != 0;
+        }
+        return result;
+    }
+
+    public static boolean[] intToBooleanArray(long number) {
+        final boolean[] ret = new boolean[32];
+        for (int i = 0; i < 32; i++) {
+            ret[32 - 1 - i] = (1 << i & number) != 0;
+        }
+        return ret;
     }
 
     public static int byteArrayToInt(byte[] bytes) {
@@ -193,16 +208,16 @@ public class LogicalUtils {
 
         boolean[] result = ONE.clone();
         while (compareTwoBooleanArrays(e, ZERO) == 1) {
-            if (IsOddArrayBoolean(e)) {
+            if (isOddArrayBoolean(e)) {
                 result = modOfTwoBooleanArrays(multiplyOfTwoBooleanArrays(b, result), m);
             }
-            e = shiftRight(e);
+            e = ArrayUtils.subarray(e, 0, e.length - 1);
             b = modOfTwoBooleanArrays(multiplyOfTwoBooleanArrays(b, b), m);
         }
         return result;
     }
 
-    private static boolean IsOddArrayBoolean(final boolean[] exponent) {
+    public static boolean isOddArrayBoolean(final boolean[] exponent) {
         return exponent[exponent.length - 1];
     }
 
@@ -228,7 +243,7 @@ public class LogicalUtils {
             reminder = subtractOfTwoBooleanArrays(reminder, dr);
 
         }
-        return reminder;
+        return removeLeftFalsesFromBooleanArray(reminder);
     }
 
     public static boolean[] multiplyOfTwoBooleanArrays(final boolean[] num1, final boolean[] num2) {
@@ -458,7 +473,68 @@ public class LogicalUtils {
             t = multiplyOfTwoBooleanArrays(t, t);
         }
         result = multiplyOfTwoBooleanArrays(result, t);
-        return result;
+        return removeLeftFalsesFromBooleanArray(result);
 
     }
+
+
+    public static boolean[] longArrayToBooleanArray(long[] value) {
+        if (value == null || value.length == 0) {
+            return ZERO;
+        }
+        boolean[] result = longToBooleanArray(value[0]);
+        for (int i = 1; i < value.length; i++) {
+            result = ArrayUtils.addAll(result, longToBooleanArray(value[i]));
+        }
+        return result;
+    }
+
+
+    public static boolean isPrime(final boolean[] value, int iterations, RandomGenerator<boolean[]> rnd) {
+
+        if (!isOddArrayBoolean(value)) {
+            return false;
+        }
+        if (iterations < 1) {
+            return true;
+        }
+        boolean[] n = value.clone();
+        boolean[] n_1 = value.clone();
+        //make n-1
+        n_1[n_1.length - 1] = false;
+        boolean[] q = n_1.clone();
+        boolean[] a = ZERO;
+        int k = 0;
+        while (!q[q.length - 1]) {
+            k++;
+            q = shiftRight(q);
+        }
+        for (int i = 0; i < iterations; i++) {
+            do {
+                a = modOfTwoBooleanArrays(rnd.next(value.length), n_1);
+            } while (compareTwoBooleanArrays(a, ONE) != 1);
+            if (compareTwoBooleanArrays(modPowOfTwoBooleanArrays(a, q, n), ONE) == 0) {
+                return true;
+            }
+            for (int j = 0; j < k; j++) {
+                //multiply q by 2
+                boolean[] q2 = ArrayUtils.add(q, false);
+                boolean[] q2j = multiplyOfTwoBooleanArrays(q2, intToBooleanArray(j));
+                if (compareTwoBooleanArrays(modPowOfTwoBooleanArrays(a, q2j, n), n_1) == 0) {
+                    return true;
+                }
+            }
+        }
+        return true;
+    }
+
+    public static boolean[] probablePrime(int numBits, RandomGenerator<boolean[]> rnd) {
+        for (; ; ) {
+            boolean[] next = rnd.next(numBits);
+            if (isPrime(next, 10, rnd)) {
+                return next;
+            }
+        }
+    }
+
 }

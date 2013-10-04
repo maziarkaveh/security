@@ -1,15 +1,20 @@
 package no.uis.security.rsa.model;
 
+import no.uis.security.common.utils.LogicalUtils;
 import no.uis.security.des.service.exceptions.IllegalMethodParameterException;
 
 import java.util.Arrays;
 
 import static no.uis.security.common.utils.LogicalUtils.*;
+import static no.uis.security.common.utils.LogicalUtils.ZERO;
 
 public class UnsignedBigNumber implements Cloneable {
+    public static final UnsignedBigNumber ZERO = new UnsignedBigNumber(LogicalUtils.ZERO);
+    public static final UnsignedBigNumber ONE = new UnsignedBigNumber(LogicalUtils.ONE);
+    public static final UnsignedBigNumber TWO = new UnsignedBigNumber(LogicalUtils.TWO);
     private final boolean[] value;
 
-    private UnsignedBigNumber(boolean[] value) {
+    public UnsignedBigNumber(boolean[] value) {
         if (value == null || !(value.length > 0)) {
             throw new IllegalMethodParameterException();
         }
@@ -31,6 +36,14 @@ public class UnsignedBigNumber implements Cloneable {
         this.value = byteArrayToBooleanArray(value);
     }
 
+    public UnsignedBigNumber(long[] value) {
+        if (value == null || !(value.length > 0)) {
+            throw new IllegalMethodParameterException();
+        }
+        this.value = LogicalUtils.longArrayToBooleanArray(value);
+    }
+
+
     public UnsignedBigNumber(int value) {
 
         this.value = longToBooleanArray(value);
@@ -40,6 +53,7 @@ public class UnsignedBigNumber implements Cloneable {
 
         this.value = longToBooleanArray(value);
     }
+
 
     private byte[] getByteValue() {
         return booleanArrayToByteArray(value.clone());
@@ -58,8 +72,8 @@ public class UnsignedBigNumber implements Cloneable {
         return new UnsignedBigNumber(subtractOfTwoBooleanArrays(getValue(), number.getValue()));
     }
 
-    public UnsignedBigNumber modPow(UnsignedBigNumber ex,UnsignedBigNumber n) {
-        return new UnsignedBigNumber(modPowOfTwoBooleanArrays(getValue(), ex.getValue(),n.getValue()));
+    public UnsignedBigNumber modPow(UnsignedBigNumber ex, UnsignedBigNumber n) {
+        return new UnsignedBigNumber(modPowOfTwoBooleanArrays(getValue(), ex.getValue(), n.getValue()));
     }
 
     public UnsignedBigNumber modInverse(UnsignedBigNumber number) {
@@ -68,6 +82,11 @@ public class UnsignedBigNumber implements Cloneable {
 
     public UnsignedBigNumber add(UnsignedBigNumber number) {
         return new UnsignedBigNumber(addOfTwoBooleanArrays(getValue(), number.getValue()));
+
+    }
+
+    public boolean isOdd() {
+        return LogicalUtils.isOddArrayBoolean(getValue());
 
     }
 
@@ -97,6 +116,14 @@ public class UnsignedBigNumber implements Cloneable {
     @Override
     public UnsignedBigNumber clone() throws CloneNotSupportedException {
         return new UnsignedBigNumber(value.clone());
+    }
+
+    public UnsignedBigNumber mod(UnsignedBigNumber n) {
+        return new UnsignedBigNumber(LogicalUtils.modOfTwoBooleanArrays(getValue(), n.getValue()));
+    }
+
+    public UnsignedBigNumber pow(int ex) {
+        return new UnsignedBigNumber(LogicalUtils.powOfBooleanArray(value, ex));
     }
 }
 

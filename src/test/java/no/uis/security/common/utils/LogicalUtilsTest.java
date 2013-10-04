@@ -1,5 +1,6 @@
 package no.uis.security.common.utils;
 
+import no.uis.security.rsa.service.impl.BooleanArrayLinearRandomGenerator;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -171,7 +172,7 @@ public class LogicalUtilsTest {
 
     @Test
     public void modInverseOfTwoBooleanArrays() {
-                BigInteger bigInteger = BigInteger.probablePrime(123,new SecureRandom());
+        BigInteger bigInteger = BigInteger.probablePrime(123, new SecureRandom());
 
 
         boolean[] n1 = LogicalUtils.hexStringToBooleanArray("4e7452b6755a969c5d8eafe01506395");
@@ -206,6 +207,20 @@ public class LogicalUtilsTest {
         boolean[] expected = LogicalUtils.hexStringToBooleanArray("9bd4f818bc5d96e23e3a9636c9df50d570bc69cbd1");
         boolean[] actuals = LogicalUtils.modPowOfTwoBooleanArrays(n1, n2, n3);
         assertArrayEquals(expected, actuals);
+        n1 = LogicalUtils.hexStringToBooleanArray("f1571c947d9e8590f1571c947d9e859");
+        n2 = LogicalUtils.hexStringToBooleanArray("1");
+        n3 = LogicalUtils.hexStringToBooleanArray("f1571c947d9e8590f1571c947d9e859242376482364");
+        expected = LogicalUtils.hexStringToBooleanArray("f1571c947d9e8590f1571c947d9e859");
+        actuals = LogicalUtils.modPowOfTwoBooleanArrays(n1, n2, n3);
+        assertArrayEquals(expected, actuals);
+
+        n1 = LogicalUtils.hexStringToBooleanArray("f1571c947d9e8590f1571c947d9e859");
+        n2 = LogicalUtils.ZERO;
+        n3 = LogicalUtils.hexStringToBooleanArray("f1571c947d9e8590f1571c947d9e859242376482364");
+        expected = LogicalUtils.ONE;
+        actuals = LogicalUtils.modPowOfTwoBooleanArrays(n1, n2, n3);
+        assertArrayEquals(expected, actuals);
+
     }
 
     @Test
@@ -316,9 +331,57 @@ public class LogicalUtilsTest {
 
     }
 
-    public static void assertArrayEquals(boolean[] expected, boolean[] acual) {
-        if (LogicalUtils.compareTwoBooleanArrays(expected, acual) != 0) {
+    public static void assertArrayEquals(boolean[] expected, boolean[] actual) {
+        if (LogicalUtils.compareTwoBooleanArrays(expected, actual) != 0) {
             Assert.fail();
         }
+    }
+
+    @Test
+    public void longToBooleanArray() {
+        long l = 2346782365834658l;
+        String s = Long.toHexString(l);
+        boolean[] expected = LogicalUtils.hexStringToBooleanArray(s);
+        boolean[] actual = LogicalUtils.longToBooleanArray(l);
+        assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    public void intToBooleanArray() {
+        int l = 324234;
+        String s = Integer.toHexString(l);
+        boolean[] expected = LogicalUtils.hexStringToBooleanArray(s);
+        boolean[] actual = LogicalUtils.intToBooleanArray(l);
+        assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    public void probablePrime() {
+        boolean[] prime = LogicalUtils.probablePrime(512, new BooleanArrayLinearRandomGenerator());
+        java.math.BigInteger bigInteger = new java.math.BigInteger(LogicalUtils.booleanArrayToStringHex(prime), 16);
+        Assert.assertTrue(bigInteger.isProbablePrime(10));
+    }
+
+
+    @Test
+    public void isPrime() {
+        for (int i = 0; i < 6; i++) {
+            java.math.BigInteger bigInteger = java.math.BigInteger.probablePrime(512, new SecureRandom());
+            boolean[] n1 = LogicalUtils.hexStringToBooleanArray(bigInteger.toString(16));
+
+            boolean probablePrime = bigInteger.isProbablePrime(10);
+            boolean prime = LogicalUtils.isPrime(n1, 10, new BooleanArrayLinearRandomGenerator());
+            Assert.assertTrue(!(prime ^ probablePrime));
+        }
+        for (int i = 0; i < 6; i++) {
+            java.math.BigInteger bigInteger = new java.math.BigInteger(512, new SecureRandom());
+            boolean[] n1 = LogicalUtils.hexStringToBooleanArray(bigInteger.toString(16));
+
+            boolean probablePrime = bigInteger.isProbablePrime(10);
+            boolean prime = LogicalUtils.isPrime(n1, 10, new BooleanArrayLinearRandomGenerator());
+            Assert.assertTrue(!(prime ^ probablePrime));
+        }
+
+
     }
 }
