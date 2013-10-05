@@ -357,24 +357,26 @@ public class LogicalUtilsTest {
 
     @Test
     public void probablePrime() {
-        boolean[] prime = LogicalUtils.probablePrime(512, new BooleanArrayLinearRandomGenerator());
-        java.math.BigInteger bigInteger = new java.math.BigInteger(LogicalUtils.booleanArrayToStringHex(prime), 16);
-        Assert.assertTrue(bigInteger.isProbablePrime(10));
+        for (int i = 0; i < 20; i++) {
+            boolean[] prime = LogicalUtils.probablePrime(20, new BooleanArrayLinearRandomGenerator());
+            java.math.BigInteger bigInteger = new java.math.BigInteger(LogicalUtils.booleanArrayToStringHex(prime), 16);
+            Assert.assertTrue(bigInteger.isProbablePrime(10));
+        }
     }
 
 
     @Test
     public void isPrime() {
-        for (int i = 0; i < 6; i++) {
-            java.math.BigInteger bigInteger = java.math.BigInteger.probablePrime(512, new SecureRandom());
+        for (int i = 0; i < 61; i++) {
+            BigInteger bigInteger = BigInteger.probablePrime(20, new SecureRandom());
             boolean[] n1 = LogicalUtils.hexStringToBooleanArray(bigInteger.toString(16));
 
             boolean probablePrime = bigInteger.isProbablePrime(10);
             boolean prime = LogicalUtils.isPrime(n1, 10, new BooleanArrayLinearRandomGenerator());
             Assert.assertTrue(!(prime ^ probablePrime));
         }
-        for (int i = 0; i < 6; i++) {
-            java.math.BigInteger bigInteger = new java.math.BigInteger(512, new SecureRandom());
+        for (int i = 0; i < 61; i++) {
+            java.math.BigInteger bigInteger = new java.math.BigInteger(20, new SecureRandom());
             boolean[] n1 = LogicalUtils.hexStringToBooleanArray(bigInteger.toString(16));
 
             boolean probablePrime = bigInteger.isProbablePrime(10);
@@ -384,4 +386,6 @@ public class LogicalUtilsTest {
 
 
     }
+
+
 }

@@ -511,18 +511,15 @@ public class LogicalUtils {
         }
         for (int i = 0; i < iterations; i++) {
             do {
-                a = modOfTwoBooleanArrays(rnd.next(value.length), n_1);
+                a = modOfTwoBooleanArrays(rnd.next(n.length), n_1);
             } while (compareTwoBooleanArrays(a, ONE) != 1);
-            if (compareTwoBooleanArrays(modPowOfTwoBooleanArrays(a, q, n), ONE) == 0) {
-                return true;
-            }
-            for (int j = 0; j < k; j++) {
-                //multiply q by 2
-                boolean[] q2 = ArrayUtils.add(q, false);
-                boolean[] q2j = multiplyOfTwoBooleanArrays(q2, intToBooleanArray(j));
-                if (compareTwoBooleanArrays(modPowOfTwoBooleanArrays(a, q2j, n), n_1) == 0) {
-                    return true;
+            boolean[] z = modPowOfTwoBooleanArrays(a, q, n);
+            int j = 0;
+            while (!((j == 0 && compareTwoBooleanArrays(z, ONE) == 0) || compareTwoBooleanArrays(z, n_1) == 0)) {
+                if (j > 0 && compareTwoBooleanArrays(z, ONE) == 0 || ++j == k) {
+                    return false;
                 }
+                z = modPowOfTwoBooleanArrays(z, TWO, n);
             }
         }
         return true;
