@@ -2,6 +2,8 @@ package no.uis.security.rsa.model;
 
 import no.uis.security.common.utils.LogicalUtils;
 import no.uis.security.des.service.exceptions.IllegalMethodParameterException;
+import no.uis.security.rsa.service.RandomGenerator;
+import no.uis.security.rsa.service.impl.BooleanArrayLinearRandomGenerator;
 
 import java.util.Arrays;
 
@@ -124,6 +126,10 @@ public class UnsignedBigNumber implements Cloneable {
 
     public UnsignedBigNumber pow(int ex) {
         return new UnsignedBigNumber(LogicalUtils.powOfBooleanArray(value, ex));
+    }
+
+    public static UnsignedBigNumber probablePrime(int nBits, RandomGenerator<UnsignedBigNumber> random) {
+        return new UnsignedBigNumber(LogicalUtils.probablePrime(nBits,new BooleanArrayLinearRandomGenerator()));
     }
 }
 

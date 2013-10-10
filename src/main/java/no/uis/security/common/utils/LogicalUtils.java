@@ -1,7 +1,6 @@
 package no.uis.security.common.utils;
 
 import no.uis.security.des.service.exceptions.IllegalMethodParameterException;
-import no.uis.security.rsa.model.UnsignedBigNumber;
 import no.uis.security.rsa.service.RandomGenerator;
 import org.apache.commons.lang.ArrayUtils;
 
@@ -9,7 +8,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 
 public class LogicalUtils {
     public static final String HEX_16_DIGITS_PATTERN = "^[0-9A-Fa-f]{16}$";
@@ -17,6 +15,11 @@ public class LogicalUtils {
     public static final boolean[] ONE = {true};
     public static final boolean[] ZERO = {false};
     public static final boolean[] TWO = {true, false};
+    public static final long INT_MASK = 0xFFFFFFFFL;
+    public static final int[] INTEGER_ZERO = {0};
+    public static final int[] INTEGER_ONE = {1};
+    public static final int[] INTEGER_TWO = {2};
+
 
     public static byte[] exclusiveOr(byte[] p1, byte[] p2) {
         if (p1.length != p2.length) {
@@ -51,7 +54,7 @@ public class LogicalUtils {
             }
             hexString.append(hex);
         }
-        return hexString.toString();
+        return hexString.toString().toUpperCase();
     }
 
     public static String byteArrayToStringBits(byte[] bytes) {
@@ -154,6 +157,19 @@ public class LogicalUtils {
         return result;
     }
 
+    public static int[] booleanArrayToIntegerArray(boolean... booleans) {
+        int intSize = (int) Math.ceil(booleans.length / 32f);
+        int[] result = new int[intSize];
+        for (int i = booleans.length - 1; i >= 0; i--) {
+            int intBytesIndex = intSize - 1 - i / 32;
+            int intByteIndex = i % 32;
+            if (booleans[booleans.length - i - 1]) {
+                result[intBytesIndex] = (int) (result[intBytesIndex] | (1 << intByteIndex));
+            }
+        }
+        return result;
+    }
+
 
     public static byte[] hexStringToByteArray(String s) {
         int len = s.length();
@@ -169,6 +185,22 @@ public class LogicalUtils {
         return data;
     }
 
+    public static int[] hexStringToIntegerArray(String s) {
+
+        StringBuffer str = new StringBuffer(s);
+        while (str.length() % 8 != 0) {
+            str.insert(0, '0');
+        }
+        int[] data = new int[str.length() / 8];
+        for (int i = 0, j = 0; i < (str.length() / 8); i++, j += 8) {
+            data[i] = (int) (Long.parseLong(str.substring(j, j + 8), 16) & INT_MASK);
+        }
+        return data;
+    }
+
+    public static long convertUnsignedIntegerToLong(int num) {
+        return INT_MASK & num;
+    }
 
     public static String byteArrayToString(byte[] code) {
         try {
@@ -228,7 +260,7 @@ public class LogicalUtils {
             return dv;
         }
         if (compareTwoBooleanArrays(dv, dr) == 0) {
-            return ONE;
+            return ZERO;
         }
         boolean[] quotient = new boolean[dividend.length];
         boolean[] reminder = ArrayUtils.subarray(dv, 0, dr.length - 1);
@@ -244,6 +276,94 @@ public class LogicalUtils {
 
         }
         return removeLeftFalsesFromBooleanArray(reminder);
+    }
+
+//    public static int[] modOfTwoIntegerArrays(final int[] dividend, final int[] divisor) {
+//        int[] dv = removeLeftZerosFromIntArray(dividend);
+//        int[] dr = removeLeftZerosFromIntArray(divisor);
+//        if (compareTwoIntegerArrays(dv, dr) == -1) {
+//            return dv;
+//        }
+//        if (compareTwoIntegerArrays(dv, dr) == 0) {
+//            return INTEGER_ZERO;
+//        }
+//        int[] quotient = dv.clone();
+//        int[] reminder = new int[quotient.length];
+//        for (int i = 0; i < dv.length*32; i++) {
+//            reminder = shiftIntegerArrayOneBitLeft(reminder);
+//            reminder[reminder.length - 1] =  reminder[reminder.length - 1]+((quotient[0] & 1<<32)>>>32) ;
+//            quotient = shiftIntegerArrayOneBitLeft(quotient);
+//            if (compareTwoIntegerArrays(reminder, dr) != -1) {
+//                reminder= subtractOfTwoIntegerArrays(reminder, dr);
+//                quotient = addOfTwoIntegerArrays(quotient,INTEGER_ONE);
+//            }
+//        }
+//        return removeLeftZerosFromIntArray(reminder);
+//
+//    }
+    public static int[] divOfTwoIntegerArrays(final int[] dividend, final int[] divisor) {
+        int[] dv = removeLeftZerosFromIntArray(dividend);
+        int[] dr = removeLeftZerosFromIntArray(divisor);
+        if (compareTwoIntegerArrays(dv, dr) == -1) {
+            return dv;
+        }
+        if (compareTwoIntegerArrays(dv, dr) == 0) {
+            return INTEGER_ZERO;
+        }
+        int[] quotient = dv.clone();
+        int[] reminder = INTEGER_ZERO;
+        for (int i = 0; i < dv.length; i++) {
+            reminder = shiftLeft(reminder);
+            reminder[reminder.length - 1] = quotient[0];
+            quotient = shiftLeft(quotient);
+            if (compareTwoIntegerArrays(reminder, dr) != -1) {
+                reminder= subtractOfTwoIntegerArrays(reminder, dr);
+                quotient = addOfTwoIntegerArrays(quotient, INTEGER_ONE);
+            }
+        }
+        return removeLeftZerosFromIntArray(quotient);
+
+    }
+
+
+    public static int[] shiftRight(final int[] n1) {
+        if (n1.length == 0) {
+            return n1;
+        }
+
+        return ArrayUtils.addAll(INTEGER_ZERO, ArrayUtils.subarray(n1, 0, n1.length - 1));
+    }
+
+    public static int[] shiftLeft(final int[] n1) {
+        if (n1.length == 0) {
+            return n1;
+        }
+        return ArrayUtils.addAll(ArrayUtils.subarray(n1, 1, n1.length), INTEGER_ZERO);
+    }
+
+    public static int[] shiftIntegerArrayOneBitRight(final int[] num) {
+        int[] r = num.clone();
+
+        for (int i = r.length - 1; i >= 0; i--) {
+
+            long p = 0;
+            if (i != 0) {
+                p = (r[i - 1] % 2) << 31;
+            }
+            r[i] = (int) ((r[i] >>> 1) + p);
+        }
+        return r;
+    }
+
+    public static int[] shiftIntegerArrayOneBitLeft(final int[] num) {
+        int[] r = ArrayUtils.addAll(INTEGER_ZERO, num.clone());
+        long p = 0;
+        for (int i = r.length - 1; i >= 0; i--) {
+            long tmp = r[i];
+            r[i] = (int) ((convertUnsignedIntegerToLong(r[i]) << 1) + p);
+            p = (tmp & (1l << 31)) >> 31;
+        }
+        return removeLeftZerosFromIntArray(r);
     }
 
     public static boolean[] multiplyOfTwoBooleanArrays(final boolean[] num1, final boolean[] num2) {
@@ -263,6 +383,47 @@ public class LogicalUtils {
         return ArrayUtils.addAll(ZERO, result);
     }
 
+
+    public static int[] multiplyOfTwoIntegerArrays(final int[] num1, final int[] num2) {
+
+        int[] minArray = compareTwoIntegerArrays(num1, num2) != 1 ? num1 : num2;
+        int[] maxArray = compareTwoIntegerArrays(num1, num2) == 1 ? num1 : num2;
+        int[] result = INTEGER_ZERO;
+        for (int i = 0; i < minArray.length; i++) {
+
+            int[] tmp = new int[maxArray.length + 1];
+            for (int j = maxArray.length; j > 0; j--) {
+
+                long mul = convertUnsignedIntegerToLong(maxArray[j - 1]) * convertUnsignedIntegerToLong(minArray[minArray.length - 1 - i]);
+                mul += tmp[j];
+                int[] vs = longToIntegerArray(mul);
+
+                if (vs.length > 1) {
+                    tmp[j - 1] = vs[0];
+                    tmp[j] = vs[1];
+                } else {
+                    tmp[j] = vs[0];
+                }
+            }
+
+            int[] num21 = ArrayUtils.addAll(tmp, new int[i]);
+            result = addOfTwoIntegerArrays(result, num21);
+
+        }
+
+        if (result.length % 2 == 0) {
+            return result;
+        }
+        return ArrayUtils.addAll(INTEGER_ZERO, result);
+    }
+
+    private static int[] longToIntegerArray(long num) {
+        if (num < INT_MASK) {
+            return new int[]{(int) num};
+        }
+        return new int[]{(int) (num / INT_MASK), (int) (num & INT_MASK)};
+    }
+
     public static boolean[] subtractOfTwoBooleanArrays(final boolean[] num1, final boolean[] num2) {
         boolean[] n1 = num1.clone();
         boolean[] n2 = num2.clone();
@@ -278,10 +439,33 @@ public class LogicalUtils {
         return ArrayUtils.subarray(sub, 1, sub.length);
     }
 
+    public static int[] subtractOfTwoIntegerArrays(final int[] num1, final int[] num2) {
+        int[] n1 = num1.clone();
+        int[] n2 = num2.clone();
+
+        if (n1.length > n2.length) {
+            n2 = ArrayUtils.addAll(new int[n1.length - n2.length], n2);
+        }
+        n2 = complementIntegerArray(n2);
+        int[] add = addOfTwoIntegerArrays(n1, n2);
+
+        int[] sub = addOfTwoIntegerArrays(add, INTEGER_ONE);
+
+        return ArrayUtils.subarray(sub, 1, sub.length);
+    }
+
     public static boolean[] complementBooleanArray(final boolean[] num) {
         boolean[] result = new boolean[num.length];
         for (int i = 0; i < num.length; i++) {
             result[i] = !num[i];
+        }
+        return result;
+    }
+
+    public static int[] complementIntegerArray(final int[] num) {
+        int[] result = new int[num.length];
+        for (int i = 0; i < num.length; i++) {
+            result[i] = ~num[i];
         }
         return result;
     }
@@ -301,6 +485,27 @@ public class LogicalUtils {
         }
         if (carry == 1) {
             result[0] = true;
+        } else {
+            result = ArrayUtils.subarray(result, 1, result.length);
+        }
+        return result;
+    }
+
+    public static int[] addOfTwoIntegerArrays(final int[] num1, final int[] num2) {
+        int n1L = num1.length;
+        int n2L = num2.length;
+        int maxLength = Math.max(n1L, n2L);
+        int[] result = new int[maxLength + 1];
+        long carry = 0;
+        for (int i = maxLength; i > 0; i--) {
+            int n1 = --n1L >= 0 ? num1[n1L] : 0;
+            int n2 = --n2L >= 0 ? num2[n2L] : 0;
+            long sum = carry + convertUnsignedIntegerToLong(n1) + convertUnsignedIntegerToLong(n2);
+            result[i] = (int) sum;
+            carry = sum > INT_MASK ? 1 : 0;
+        }
+        if (carry == 1) {
+            result[0] = 1;
         } else {
             result = ArrayUtils.subarray(result, 1, result.length);
         }
@@ -438,12 +643,40 @@ public class LogicalUtils {
         return 0;
     }
 
+    public static int compareTwoIntegerArrays(final int[] n1, final int[] n2) {
+
+        int[] num1 = removeLeftZerosFromIntArray(n1);
+        int[] num2 = removeLeftZerosFromIntArray(n2);
+        if (num1.length > num2.length) {
+            return 1;
+        }
+        if (num1.length < num2.length) {
+            return -1;
+        }
+        for (int i = 0; i < num1.length; i++) {
+            if (convertUnsignedIntegerToLong(num1[i]) == convertUnsignedIntegerToLong(num2[i])) {
+                continue;
+            }
+            return convertUnsignedIntegerToLong(num1[i]) > convertUnsignedIntegerToLong(num2[i]) ? 1 : -1;
+        }
+        return 0;
+    }
+
     public static boolean[] removeLeftFalsesFromBooleanArray(final boolean[] n1) {
         if (n1.length == 0) {
             return n1;
         }
         int n1i = -1;
         while (++n1i < n1.length && !n1[n1i]) ;
+        return ArrayUtils.subarray(n1, n1i, n1.length);
+    }
+
+    public static int[] removeLeftZerosFromIntArray(final int[] n1) {
+        if (n1.length == 0) {
+            return n1;
+        }
+        int n1i = -1;
+        while (++n1i < n1.length && n1[n1i] == 0) ;
         return ArrayUtils.subarray(n1, n1i, n1.length);
     }
 
@@ -490,6 +723,10 @@ public class LogicalUtils {
     }
 
 
+    public static boolean isPrime(final boolean[] value, RandomGenerator<boolean[]> rnd) {
+        return isPrime(value, 1, rnd);
+    }
+
     public static boolean isPrime(final boolean[] value, int iterations, RandomGenerator<boolean[]> rnd) {
 
         if (!isOddArrayBoolean(value)) {
@@ -528,7 +765,8 @@ public class LogicalUtils {
     public static boolean[] probablePrime(int numBits, RandomGenerator<boolean[]> rnd) {
         for (; ; ) {
             boolean[] next = rnd.next(numBits);
-            if (isPrime(next, 10, rnd)) {
+            next[next.length - 1] = true;
+            if (isPrime(next, rnd)) {
                 return next;
             }
         }
