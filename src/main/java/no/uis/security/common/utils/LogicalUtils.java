@@ -57,6 +57,20 @@ public class LogicalUtils {
         return hexString.toString().toUpperCase();
     }
 
+    public static String intArrayToStringHex(int[] num) {
+        StringBuffer hexString = new StringBuffer();
+
+        for (int i = 0; i < num.length; i++) {
+            String hex = Integer.toHexString(num[i]);
+
+            for (int j = 0; j < 4 - hex.length(); j++) {
+                hexString.append('0');
+            }
+            hexString.append(hex);
+        }
+        return hexString.toString().toUpperCase();
+    }
+
     public static String byteArrayToStringBits(byte[] bytes) {
         StringBuffer s = new StringBuffer();
 
@@ -140,6 +154,19 @@ public class LogicalUtils {
 
     }
 
+    public static boolean[] intArrayToBooleanArray(int... bytes) {
+        int bitsSize = bytes.length * 32;
+        boolean[] result = new boolean[bitsSize];
+        for (int i = 0, j = 0; i < bitsSize; i++, j++) {
+            int intBytesIndex = i / 32;
+            int intByteIndex = 31 - i % 32;
+            result[j] = (bytes[intBytesIndex] & 1 << intByteIndex) != 0;
+
+        }
+        return result;
+
+    }
+
     public static String booleanArrayToStringHex(final boolean[] value) {
         return byteArrayToStringHex(booleanArrayToByteArray(value));
     }
@@ -152,6 +179,19 @@ public class LogicalUtils {
             int intByteIndex = i % 8;
             if (booleans[booleans.length - i - 1]) {
                 result[intBytesIndex] = (byte) (result[intBytesIndex] | (1 << intByteIndex));
+            }
+        }
+        return result;
+    }
+
+    public static int[] booleanArrayToIntArray(boolean... booleans) {
+        int intSize = (int) Math.ceil(booleans.length / 32f);
+        int[] result = new int[intSize];
+        for (int i = booleans.length - 1; i >= 0; i--) {
+            int intBytesIndex = intSize - 1 - i / 32;
+            int intByteIndex = i % 32;
+            if (booleans[booleans.length - i - 1]) {
+                result[intBytesIndex] = (int) (result[intBytesIndex] | (1 << intByteIndex));
             }
         }
         return result;
@@ -249,11 +289,34 @@ public class LogicalUtils {
         return result;
     }
 
-    public static boolean isOddArrayBoolean(final boolean[] exponent) {
-        return exponent[exponent.length - 1];
+  /*  public static int[] modPowOfTwoIntegerArrays(final int[] base, final int[] exponent, final int[] modulus) {
+        int[] b = base.clone();
+        int[] e = exponent.clone();
+        int[] m = modulus.clone();
+        int[] result = INTEGER_ONE.clone();
+        while (compareTwoIntegerArrays(e, INTEGER_ZERO) == 1) {
+            if (isOddArrayInteger(e)) {
+                result = modOfTwoIntegerArrays(multiplyOfTwoIntegerArrays(result, b), m);
+            }
+            i++;
+            e = shiftIntegerArrayOneBitRight(e);
+            b = modOfTwoIntegerArrays(multiplyOfTwoIntegerArrays(b, b), m);
+        }
+        return result;
+    }*/
+
+    public static boolean isOddArrayBoolean(final boolean[] num) {
+        return num[num.length - 1];
+    }
+
+    public static boolean isOddArrayInteger(final int[] num) {
+        return num[num.length - 1] % 2 == 1;
     }
 
     public static boolean[] modOfTwoBooleanArrays(final boolean[] dividend, final boolean[] divisor) {
+        if (true) {
+            return intArrayToBooleanArray(modOfTwoIntegerArrays(booleanArrayToIntArray(dividend), booleanArrayToIntArray(divisor)));
+        }
         boolean[] dv = removeLeftFalsesFromBooleanArray(dividend);
         boolean[] dr = removeLeftFalsesFromBooleanArray(divisor);
         if (compareTwoBooleanArrays(dv, dr) == -1) {
@@ -413,6 +476,11 @@ public class LogicalUtils {
 
     public static int[] multiplyOfTwoIntegerArrays(final int[] num1, final int[] num2) {
 
+        if (true) {
+            return booleanArrayToIntArray(multiplyOfTwoBooleanArrays(intArrayToBooleanArray(num1), intArrayToBooleanArray(num2)));
+        }
+
+
         int[] minArray = compareTwoIntegerArrays(num1, num2) != 1 ? num1 : num2;
         int[] maxArray = compareTwoIntegerArrays(num1, num2) == 1 ? num1 : num2;
         int[] result = INTEGER_ZERO;
@@ -420,35 +488,24 @@ public class LogicalUtils {
 
             int[] tmp = new int[maxArray.length + 1];
             for (int j = maxArray.length; j > 0; j--) {
-
                 long mul = convertUnsignedIntegerToLong(maxArray[j - 1]) * convertUnsignedIntegerToLong(minArray[minArray.length - 1 - i]);
                 mul += tmp[j];
                 int[] vs = longToIntegerArray(mul);
-
-                if (vs.length > 1) {
-                    tmp[j - 1] = vs[0];
-                    tmp[j] = vs[1];
-                } else {
-                    tmp[j] = vs[0];
-                }
+                System.out.println(tmp[j]);
+                tmp[j - 1] = vs[0];
+                tmp[j] = vs[1];
             }
-
             int[] num21 = ArrayUtils.addAll(tmp, new int[i]);
             result = addOfTwoIntegerArrays(result, num21);
-
         }
-
-        if (result.length % 2 == 0) {
-            return result;
-        }
-        return ArrayUtils.addAll(INTEGER_ZERO, result);
+        return result;
     }
 
     private static int[] longToIntegerArray(long num) {
-        if (num < INT_MASK) {
-            return new int[]{(int) num};
-        }
-        return new int[]{(int) (num / INT_MASK), (int) (num & INT_MASK)};
+        int[] r = new int[2];
+        r[1] = (int) (num & INT_MASK);
+        r[0] = (int) ((num & 0xffffffff00000000L) >>> 32);
+        return r;
     }
 
     public static boolean[] subtractOfTwoBooleanArrays(final boolean[] num1, final boolean[] num2) {
@@ -737,6 +794,21 @@ public class LogicalUtils {
 
     }
 
+    public static int[] powOfIntegerArray(final int[] num, int e) {
+        int[] result = INTEGER_ONE;
+        int[] t = num.clone();
+        while (e > 1) {
+            if (e % 2 == 1) {
+                result = multiplyOfTwoIntegerArrays(result, t);
+            }
+            e = (int) Math.floor(e / 2);
+            t = multiplyOfTwoIntegerArrays(t, t);
+        }
+        result = multiplyOfTwoIntegerArrays(result, t);
+        return removeLeftZerosFromIntArray(result);
+
+    }
+
 
     public static boolean[] longArrayToBooleanArray(long[] value) {
         if (value == null || value.length == 0) {
@@ -838,4 +910,6 @@ public class LogicalUtils {
         }
         return res;
     }
+
+
 }

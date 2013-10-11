@@ -6,6 +6,8 @@ import org.junit.Test;
 
 import java.security.SecureRandom;
 
+import static no.uis.security.common.utils.LogicalUtils.addOfTwoIntegerArrays;
+
 
 public class LogicalUtilsTest {
     @Test
@@ -102,6 +104,15 @@ public class LogicalUtilsTest {
     }
 
     @Test
+    public void intArrayToBooleanArray() {
+        int[] ints = {0xff3344cc, 0xff3344cc, 0x2f3344cc};
+        boolean[] expected1 = LogicalUtils.hexStringToBooleanArray("ff3344ccff3344cc2f3344cc");
+        boolean[] booleans = LogicalUtils.intArrayToBooleanArray(ints);
+        assertArrayEquals(expected1, booleans);
+
+    }
+
+    @Test
     public void booleanArrayToByteArray() {
         byte[] expected1 = {0b00100001, 0b01010001};
         boolean[] booleans = {true, false, false, false, false, true, false, true, false, true, false, false, false, true};
@@ -112,6 +123,17 @@ public class LogicalUtilsTest {
         byte[] bytes2 = LogicalUtils.booleanArrayToByteArray(booleans2);
 
         Assert.assertArrayEquals(expected2, bytes2);
+
+
+    }
+
+    @Test
+    public void intArrayToByteArray() {
+        boolean[] n = LogicalUtils.hexStringToBooleanArray("ff3344ccff3344cc2f3344cc");
+        int[] expected = {0xff3344cc, 0xff3344cc, 0x2f3344cc};
+        int[] r = LogicalUtils.booleanArrayToIntArray(n);
+
+        Assert.assertArrayEquals(expected, r);
 
 
     }
@@ -236,6 +258,7 @@ public class LogicalUtilsTest {
 
     }
 
+
     @Test
     public void modOfTwoBooleanArrays() {
 
@@ -255,7 +278,6 @@ public class LogicalUtilsTest {
     public void modOfTwoIntegerArrays() {
         int[] n1 = LogicalUtils.hexStringToIntegerArray("f1571c947d9e8590f1571c947d9e859242376482364f1571c947d9e8590f1571c947d9e859242376482364");
         int[] n2 = LogicalUtils.hexStringToIntegerArray("ffff90328403820948039284083204809328403288273479327498237");
-        System.out.println(new BigInteger("f1571c947d9e8590f1571c947d9e859242376482364f1571c947d9e8590f1571c947d9e859242376482364", 16).mod(new BigInteger("ffff90328403820948039284083204809328403288273479327498237", 16)).toString(16));
         int[] expected = LogicalUtils.hexStringToIntegerArray("ea2146e8e8a40c370dc3431ec23d579d6c877959ad9f01223169f2911");
         int[] actuals = LogicalUtils.modOfTwoIntegerArrays(n1, n2);
         Assert.assertArrayEquals(expected, actuals);
@@ -274,7 +296,6 @@ public class LogicalUtilsTest {
         n1 = LogicalUtils.hexStringToIntegerArray("f1571c947d9e8590f1571c947d9e859242376482364f1571c947d9e8590f1571c947d9e859242376482364");
         n2 = LogicalUtils.hexStringToIntegerArray("322408ddcc384023e34242380483028408ddcc384023e34242380483028408ddcc384023e");
         expected = LogicalUtils.hexStringToIntegerArray("4d0317fb55426c");
-        System.out.println(new BigInteger("f1571c947d9e8590f1571c947d9e859242376482364f1571c947d9e8590f1571c947d9e859242376482364", 16).divide(new BigInteger("322408ddcc384023e34242380483028408ddcc384023e34242380483028408ddcc384023e", 16)).toString(16));
         actuals = LogicalUtils.divOfTwoIntegerArrays(n1, n2);
         Assert.assertArrayEquals(LogicalUtils.removeLeftZerosFromIntArray(expected), LogicalUtils.removeLeftZerosFromIntArray(actuals));
 
@@ -292,7 +313,6 @@ public class LogicalUtilsTest {
         boolean[] n1 = LogicalUtils.hexStringToBooleanArray("e385217404a2aad5d91061ffccb446ad49c72da1ebc13f4883325747064e54dd5a6d9a3cb20b8502d8bc857d59ac0a3d00e0483f6a854e4d2ac239934ad231cda4cea454b1c2f1ab9332d11a7403b3dc624c1d247f10");
         long l = System.currentTimeMillis();
         boolean[] actuals = LogicalUtils.sqrtOfBooleanArray(n1);
-        System.out.println(System.currentTimeMillis() - l);
         assertArrayEquals(expected, actuals);
 
 
@@ -393,8 +413,14 @@ public class LogicalUtilsTest {
         n2 = LogicalUtils.hexStringToBooleanArray("f1571c947d9e8590f1571c947d9e859242376482364");
         expected = LogicalUtils.hexStringToBooleanArray("e385217404a2aad5d91061ffccb446ab28ac46a2bb92adbc335bf104b78111e6003aeaedc4");
         actuals = LogicalUtils.multiplyOfTwoBooleanArrays(n1, n2);
-
         assertArrayEquals(expected, actuals);
+
+        n1 = LogicalUtils.hexStringToBooleanArray("E385217404A2AAD5D91061FFCCB446A907915FA38B808CD412061F17C36EF1E385217404A2AAD5D91061FFCCB446A907915FA38B808CD412061F17C36EF1E385217404A2AAD5D91061FFCCB446A907915FA38B808CD412061F17C36EF1");
+        n2 = LogicalUtils.hexStringToBooleanArray("E385217404A2AAD5D91061FFCCB446A907915FA38B808CD412061F17C36EF12");
+        expected = LogicalUtils.hexStringToBooleanArray("ca355e8f872469c2e4b20947c05f1df1e24196e4964304db43bce335630e2bff170331eaf3cd7add972baba30384f874df5001508acd2466db2699957aeb1f170331eaf3cd7add972baba30384f874df5001508acd2466db2699957aea54e1a4a263cf63b7f8e52263e2a46706929db91cba47c849231e4364326cbf2");
+        actuals = LogicalUtils.multiplyOfTwoBooleanArrays(n1, n2);
+        assertArrayEquals(expected, actuals);
+
     }
 
     @Test
@@ -405,15 +431,29 @@ public class LogicalUtilsTest {
         int[] n2 = LogicalUtils.hexStringToIntegerArray("99BB");
         int[] expected = LogicalUtils.hexStringToIntegerArray("521C2A1CA");
         int[] actuals = LogicalUtils.multiplyOfTwoIntegerArrays(n1, n2);
-
         Assert.assertArrayEquals(expected, actuals);
+
+        n1 = LogicalUtils.hexStringToIntegerArray("f1571c947d9e8590f1571c947d9e859");
+        n2 = LogicalUtils.hexStringToIntegerArray("f1571c947d9e8590f1571c947d9e859");
+
+        expected = LogicalUtils.hexStringToIntegerArray("e385217404a2aad5d91061ffccb446a907915fa38b808cd412061f17c36ef1");
+        actuals = LogicalUtils.multiplyOfTwoIntegerArrays(n1, n2);
+        Assert.assertArrayEquals(expected, actuals);
+
 
         n1 = LogicalUtils.hexStringToIntegerArray("f1571c947d9e8590f1571c947d9e859");
         n2 = LogicalUtils.hexStringToIntegerArray("f1571c947d9e8590f1571c947d9e859242376482364");
         expected = LogicalUtils.hexStringToIntegerArray("e385217404a2aad5d91061ffccb446ab28ac46a2bb92adbc335bf104b78111e6003aeaedc4");
         actuals = LogicalUtils.multiplyOfTwoIntegerArrays(n1, n2);
-
         Assert.assertArrayEquals(expected, actuals);
+
+        n1 = LogicalUtils.hexStringToIntegerArray("E385217404A2AAD5D91061FFCCB446A907915FA38B808CD412061F17C36EF1E385217404A2AAD5D91061FFCCB446A907915FA38B808CD412061F17C36EF1E385217404A2AAD5D91061FFCCB446A907915FA38B808CD412061F17C36EF1");
+        n2 = LogicalUtils.hexStringToIntegerArray("E385217404A2AAD5D91061FFCCB446A907915FA38B808CD412061F17C36EF12");
+        expected = LogicalUtils.hexStringToIntegerArray("ca355e8f872469c2e4b20947c05f1df1e24196e4964304db43bce335630e2bff170331eaf3cd7add972baba30384f874df5001508acd2466db2699957aeb1f170331eaf3cd7add972baba30384f874df5001508acd2466db2699957aea54e1a4a263cf63b7f8e52263e2a46706929db91cba47c849231e4364326cbf2");
+        actuals = LogicalUtils.multiplyOfTwoIntegerArrays(n1, n2);
+        Assert.assertArrayEquals(expected, actuals);
+
+
         n1 = LogicalUtils.hexStringToIntegerArray("f1571c947d9e8590f1571c947d9e859242376482364");
         n2 = LogicalUtils.INTEGER_TWO;
 
@@ -445,12 +485,22 @@ public class LogicalUtilsTest {
     }
 
     @Test
-    public void addOfTwoIntegerArrays() {
+    public void addOfTwoIntegerArraysTest() {
         int[] n1 = LogicalUtils.hexStringToIntegerArray("f1571c947d9e8590f1571c947d9e859");
         int[] n2 = LogicalUtils.hexStringToIntegerArray("4eff8faeeb0e7fa06dbf8faeeb0e7fa01ec0");
         int[] expected = LogicalUtils.hexStringToIntegerArray("4eff9ec45cd7c77a56189ec45cd7c77a0719");
+        Assert.assertArrayEquals(expected, addOfTwoIntegerArrays(n1, n2));
 
-        Assert.assertArrayEquals(expected, LogicalUtils.addOfTwoIntegerArrays(n1, n2));
+
+        n2 = LogicalUtils.hexStringToIntegerArray("f1571c947d9e8590E385217404A2AAD5D91061FFCCB446A907915FA38B808CD412061F17C36EF1f1571c947d9e859E385217404A2AAD5D91061FFCCB446A907915FA38B808CD412061F17C36EF1");
+        expected = LogicalUtils.hexStringToIntegerArray("a5ebe3a6165cfbd39c6b86ffc32fd573053b435fdcbbf0943533f1c06fe860d1cc643560565c4655ebe3a6165cfbdcc6b86ffc32fd573053b435fdcbbf0943533f1c06fe860d1cc643560565c45b");
+        int[] r = LogicalUtils.INTEGER_ZERO;
+        for (int i = 0; i < 11; i++) {
+            r = addOfTwoIntegerArrays(r, n2);
+        }
+        Assert.assertArrayEquals(expected, r);
+
+
     }
 
     @Test
@@ -461,6 +511,17 @@ public class LogicalUtilsTest {
         boolean[] expected = LogicalUtils.hexStringToBooleanArray("84434d6c795cf6e8a2c595181ed111d5bc63712dcbee36882e247d8e988a423fd005f97026c24bd15748fc0c61c0fb42c9504241e47d6831840eac80cc4a51fa070e04ab07187040100000000");
         boolean[] actuals = LogicalUtils.powOfBooleanArray(n1, 32);
         assertArrayEquals(expected, actuals);
+
+
+    }
+
+    @Test
+    public void powOfIntArray() {
+
+        int[] n1 = LogicalUtils.hexStringToIntegerArray("88BBE");
+        int[] expected = LogicalUtils.hexStringToIntegerArray("84434d6c795cf6e8a2c595181ed111d5bc63712dcbee36882e247d8e988a423fd005f97026c24bd15748fc0c61c0fb42c9504241e47d6831840eac80cc4a51fa070e04ab07187040100000000");
+        int[] actuals = LogicalUtils.powOfIntegerArray(n1, 32);
+        Assert.assertArrayEquals(expected, actuals);
 
 
     }
@@ -531,11 +592,9 @@ public class LogicalUtilsTest {
 
     @Test
     public void probablePrime() {
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 20; i++) {
 
-            long l = System.currentTimeMillis();
-            boolean[] prime = LogicalUtils.probablePrime(10, new BooleanArrayLinearRandomGenerator());
-//            System.out.println(System.currentTimeMillis() - l);
+            boolean[] prime = LogicalUtils.probablePrime(20, new BooleanArrayLinearRandomGenerator());
             java.math.BigInteger bigInteger = new java.math.BigInteger(LogicalUtils.booleanArrayToStringHex(prime), 16);
             Assert.assertTrue(bigInteger.isProbablePrime(2));
         }
@@ -564,27 +623,6 @@ public class LogicalUtilsTest {
 
     }
 
-    @Test
-    public void isPrime2() {
-        for (int i = 0; i < 61; i++) {
-            BigInteger bigInteger = BigInteger.probablePrime(20, new SecureRandom());
-            boolean[] n1 = LogicalUtils.hexStringToBooleanArray(bigInteger.toString(16));
-
-            boolean probablePrime = bigInteger.isProbablePrime(10);
-            boolean prime = LogicalUtils.isPrime2(n1);
-            Assert.assertTrue(!(prime ^ probablePrime));
-        }
-        for (int i = 0; i < 61; i++) {
-            java.math.BigInteger bigInteger = new java.math.BigInteger(20, new SecureRandom());
-            boolean[] n1 = LogicalUtils.hexStringToBooleanArray(bigInteger.toString(16));
-
-            boolean probablePrime = bigInteger.isProbablePrime(10);
-            boolean prime = LogicalUtils.isPrime2(n1);
-            Assert.assertTrue(!(prime ^ probablePrime));
-        }
-
-
-    }
 
     @Test
     public void convertUnsignedIntegerToLong() {
