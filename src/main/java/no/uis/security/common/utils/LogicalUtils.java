@@ -278,51 +278,78 @@ public class LogicalUtils {
         return removeLeftFalsesFromBooleanArray(reminder);
     }
 
-//    public static int[] modOfTwoIntegerArrays(final int[] dividend, final int[] divisor) {
-//        int[] dv = removeLeftZerosFromIntArray(dividend);
-//        int[] dr = removeLeftZerosFromIntArray(divisor);
-//        if (compareTwoIntegerArrays(dv, dr) == -1) {
-//            return dv;
-//        }
-//        if (compareTwoIntegerArrays(dv, dr) == 0) {
-//            return INTEGER_ZERO;
-//        }
-//        int[] quotient = dv.clone();
-//        int[] reminder = new int[quotient.length];
-//        for (int i = 0; i < dv.length*32; i++) {
-//            reminder = shiftIntegerArrayOneBitLeft(reminder);
-//            reminder[reminder.length - 1] =  reminder[reminder.length - 1]+((quotient[0] & 1<<32)>>>32) ;
-//            quotient = shiftIntegerArrayOneBitLeft(quotient);
-//            if (compareTwoIntegerArrays(reminder, dr) != -1) {
-//                reminder= subtractOfTwoIntegerArrays(reminder, dr);
-//                quotient = addOfTwoIntegerArrays(quotient,INTEGER_ONE);
-//            }
-//        }
-//        return removeLeftZerosFromIntArray(reminder);
-//
-//    }
+    public static int[] modOfTwoIntegerArrays(final int[] dividend, final int[] divisor) {
+        return returnDivAndRemainOfTwoIntegerArrays(dividend, divisor)[1];
+    }
+
     public static int[] divOfTwoIntegerArrays(final int[] dividend, final int[] divisor) {
-        int[] dv = removeLeftZerosFromIntArray(dividend);
-        int[] dr = removeLeftZerosFromIntArray(divisor);
+
+
+        return returnDivAndRemainOfTwoIntegerArrays(dividend, divisor)[0];
+    }
+
+    /**
+     * @param dividend
+     * @param divisor
+     * @return int[0][] = quotient    and   int[1][] = reminder
+     */
+    private static int[][] returnDivAndRemainOfTwoIntegerArrays(final int[] dividend, final int[] divisor) {
+        int[][] result = new int[2][];
+        final int[] dv = removeLeftZerosFromIntArray(dividend);
+        final int[] dr = removeLeftZerosFromIntArray(divisor);
         if (compareTwoIntegerArrays(dv, dr) == -1) {
-            return dv;
+            result[0] = INTEGER_ZERO;
+            result[1] = dv;
+            return result;
         }
         if (compareTwoIntegerArrays(dv, dr) == 0) {
-            return INTEGER_ZERO;
+            result[0] = INTEGER_ONE;
+            result[1] = INTEGER_ZERO;
+            return result;
         }
-        int[] quotient = dv.clone();
-        int[] reminder = INTEGER_ZERO;
-        for (int i = 0; i < dv.length; i++) {
-            reminder = shiftLeft(reminder);
-            reminder[reminder.length - 1] = quotient[0];
+        int[] quotient = new int[dividend.length];
+        int[] reminder = ArrayUtils.subarray(dv, 0, dr.length - 1);
+        for (int i = dr.length - 1; i < dv.length; i++) {
             quotient = shiftLeft(quotient);
-            if (compareTwoIntegerArrays(reminder, dr) != -1) {
-                reminder= subtractOfTwoIntegerArrays(reminder, dr);
-                quotient = addOfTwoIntegerArrays(quotient, INTEGER_ONE);
+            reminder = ArrayUtils.add(reminder, dv[i]);
+            long tmp = 0;
+            int cmp = compareTwoIntegerArrays(reminder, dr);
+            if (cmp == -1) {
+                quotient[quotient.length - 1] = 0;
+                continue;
             }
-        }
-        return removeLeftZerosFromIntArray(quotient);
+            if (cmp == 0) {
+                quotient[quotient.length - 1] = 1;
+                continue;
+            }
 
+            long q = 0;
+            for (; ; ) {
+                tmp = 1;
+                int[] t = dr.clone();
+                if (compareTwoIntegerArrays(reminder, t) != -1) {
+                    while (compareTwoIntegerArrays(reminder, t) == 1) {
+                        tmp <<= 1;
+                        t = shiftIntegerArrayOneBitLeft(t);
+                    }
+                    tmp >>>= 1;
+                    t = shiftIntegerArrayOneBitRight(t);
+                }
+                reminder = subtractOfTwoIntegerArrays(reminder, t);
+                q += tmp;
+                if (compareTwoIntegerArrays(reminder, dr) == -1) {
+                    break;
+                }
+
+
+            }
+            quotient[quotient.length - 1] = (int) (q);
+
+
+        }
+        result[0] = removeLeftZerosFromIntArray(quotient);
+        result[1] = removeLeftZerosFromIntArray(reminder);
+        return result;
     }
 
 
@@ -727,6 +754,24 @@ public class LogicalUtils {
         return isPrime(value, 1, rnd);
     }
 
+    public static boolean isPrime2(final boolean[] value) {
+        boolean[] n = value.clone();
+        boolean[] i = TWO;
+        if (compareTwoBooleanArrays(n, TWO) != 1) {
+            return true;
+        }
+        boolean[] sqrN = sqrtOfBooleanArray(n);
+        while (compareTwoBooleanArrays(i, sqrN) != 1) {
+
+            if (compareTwoBooleanArrays(modOfTwoBooleanArrays(n, i), ZERO) == 0) {
+                return false;
+            }
+            i = addOfTwoBooleanArrays(i, ONE);
+
+        }
+        return true;
+    }
+
     public static boolean isPrime(final boolean[] value, int iterations, RandomGenerator<boolean[]> rnd) {
 
         if (!isOddArrayBoolean(value)) {
@@ -772,4 +817,25 @@ public class LogicalUtils {
         }
     }
 
+    public static boolean[] sqrtOfBooleanArray(boolean[] num) {
+        boolean[] n = num.clone();
+        boolean[] res = ZERO;
+        boolean[] bit = new boolean[n.length];
+        bit[1] = true;
+        while (compareTwoBooleanArrays(bit, n) == 1) {
+            bit = shiftRight(shiftRight(bit));
+        }
+
+        while (compareTwoBooleanArrays(bit, ZERO) != 0) {
+            boolean[] a = addOfTwoBooleanArrays(res, bit);
+            if (compareTwoBooleanArrays(n, a) != -1) {
+                n = subtractOfTwoBooleanArrays(n, a);
+                res = addOfTwoBooleanArrays(shiftRight(res), bit);
+            } else {
+                res = shiftRight(res);
+            }
+            bit = shiftRight(shiftRight(bit));
+        }
+        return res;
+    }
 }
