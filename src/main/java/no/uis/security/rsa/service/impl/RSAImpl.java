@@ -27,12 +27,13 @@ public class RSAImpl {
         if (numBytes > 12) {
             log.warn("number of bits exceeding 100 make system  speed low");
         }
-        this.blockSize = 2;
         UnsignedBigNumber p = UnsignedBigNumber.probablePrime(numBytes * 4, random);
         UnsignedBigNumber q = UnsignedBigNumber.probablePrime(numBytes * 4, random);
         UnsignedBigNumber phi = (p.subtract(one)).multiply(q.subtract(one));
 
         modulus = p.multiply(q);
+        this.blockSize = modulus.getBytes().length-1;
+
         publicKey = UnsignedBigNumber.probablePrime(numBytes * 8, random);
         privateKey = publicKey.modInverse(phi);
     }
@@ -118,7 +119,7 @@ public class RSAImpl {
 
             byte[] encrypt = key.encrypt(s);
             byte[] decrypt = key.decrypt(encrypt);
-            System.out.println("message   = " + s);
+            System.out.println("message   = " + key);
             System.out.println("decrypted = " + new String(decrypt));
         }
     }

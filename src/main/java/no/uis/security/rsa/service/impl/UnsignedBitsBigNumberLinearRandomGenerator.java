@@ -4,12 +4,14 @@ import no.uis.security.rsa.model.UnsignedBigNumber;
 import no.uis.security.rsa.service.RandomGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 /**
  * Adapter
  */
 @Service
+@Scope("prototype")
 public class UnsignedBitsBigNumberLinearRandomGenerator implements RandomGenerator<UnsignedBigNumber> {
 
     @Autowired

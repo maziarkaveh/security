@@ -1,4 +1,4 @@
-package no.uis.security.des.userinterface.text.enums;
+package no.uis.security.rsa.userinterface.text.enums;
 
 import static no.uis.security.common.utils.LogicalUtils.hexStringToByteArray;
 import static no.uis.security.common.utils.LogicalUtils.stringMatchesHex;
@@ -35,6 +35,22 @@ public enum Action {
         @Override
         public boolean validateInput(String text) {
             return stringMatchesHex(text);
+        }
+    },
+    GENERATE_RSA("generate RSA keys") {
+        @Override
+        public byte[] convertTextToByte(String text) {
+            throw new IllegalStateException();
+        }
+
+        @Override
+        public boolean validateInput(String text) {
+            try {
+                Integer.parseInt(text);
+            } catch (Exception e) {
+                return false;
+            }
+            return true;
         }
     };
     private final String name;

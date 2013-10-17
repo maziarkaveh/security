@@ -2,6 +2,7 @@ package no.uis.security.rsa.service.impl;
 
 import no.uis.security.common.utils.LogicalUtils;
 import no.uis.security.rsa.service.RandomGenerator;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import static no.uis.security.common.utils.LogicalUtils.*;
@@ -14,6 +15,7 @@ import static no.uis.security.common.utils.LogicalUtils.*;
  * To change this template use File | Settings | File Templates.
  */
 @Service
+@Scope("prototype")
 public class BooleanArrayLinearRandomGenerator implements RandomGenerator<boolean[]> {
 
     private final static boolean[] A = LogicalUtils.hexStringToBooleanArray("41A7");

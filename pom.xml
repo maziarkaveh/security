@@ -6,7 +6,7 @@
 
     <groupId>no.uis.security</groupId>
     <artifactId>security-assigment-2</artifactId>
-    <version>2.0-SNAPSHOT</version>
+    <version>2.0</version>
     <build>
 
         <plugins>
@@ -26,7 +26,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>no.uis.security.des.MainClass</mainClass>
+                            <mainClass>no.uis.security.rsa.MainClass</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
