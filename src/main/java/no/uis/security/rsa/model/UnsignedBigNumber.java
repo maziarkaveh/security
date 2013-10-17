@@ -60,34 +60,34 @@ public class UnsignedBigNumber implements Cloneable {
         return booleanArrayToByteArray(value.clone());
     }
 
-    private boolean[] getValue() {
-        return value.clone();
+    public boolean[] getBits() {
+        return value;
     }
 
 
     public UnsignedBigNumber multiply(UnsignedBigNumber number) {
-        return new UnsignedBigNumber(multiplyOfTwoBooleanArrays(getValue(), number.getValue()));
+        return new UnsignedBigNumber(multiplyOfTwoBooleanArrays(getBits(), number.getBits()));
     }
 
     public UnsignedBigNumber subtract(UnsignedBigNumber number) {
-        return new UnsignedBigNumber(subtractOfTwoBooleanArrays(getValue(), number.getValue()));
+        return new UnsignedBigNumber(subtractOfTwoBooleanArrays(getBits(), number.getBits()));
     }
 
     public UnsignedBigNumber modPow(UnsignedBigNumber ex, UnsignedBigNumber n) {
-        return new UnsignedBigNumber(modPowOfTwoBooleanArrays(getValue(), ex.getValue(), n.getValue()));
+        return new UnsignedBigNumber(modPowOfTwoBooleanArrays(getBits(), ex.getBits(), n.getBits()));
     }
 
     public UnsignedBigNumber modInverse(UnsignedBigNumber number) {
-        return new UnsignedBigNumber(modInverseOfTwoBooleanArrays(getValue(), number.getValue()));
+        return new UnsignedBigNumber(modInverseOfTwoBooleanArrays(getBits(), number.getBits()));
     }
 
     public UnsignedBigNumber add(UnsignedBigNumber number) {
-        return new UnsignedBigNumber(addOfTwoBooleanArrays(getValue(), number.getValue()));
+        return new UnsignedBigNumber(addOfTwoBooleanArrays(getBits(), number.getBits()));
 
     }
 
     public boolean isOdd() {
-        return LogicalUtils.isOddArrayBoolean(getValue());
+        return LogicalUtils.isOddArrayBoolean(getBits());
 
     }
 
@@ -116,11 +116,11 @@ public class UnsignedBigNumber implements Cloneable {
 
     @Override
     public UnsignedBigNumber clone() throws CloneNotSupportedException {
-        return new UnsignedBigNumber(value.clone());
+        return new UnsignedBigNumber(value);
     }
 
     public UnsignedBigNumber mod(UnsignedBigNumber n) {
-        return new UnsignedBigNumber(LogicalUtils.modOfTwoBooleanArrays(getValue(), n.getValue()));
+        return new UnsignedBigNumber(LogicalUtils.modOfTwoBooleanArrays(getBits(), n.getBits()));
     }
 
     public UnsignedBigNumber pow(int ex) {
@@ -132,7 +132,7 @@ public class UnsignedBigNumber implements Cloneable {
     }
 
     public static UnsignedBigNumber probablePrimeWithOneGCD(int nBits, UnsignedBigNumber phi, RandomGenerator<UnsignedBigNumber> random) {
-        return new UnsignedBigNumber(LogicalUtils.probablePrimeWithOneGCD(nBits,phi.getValue() ,new BooleanArrayLinearRandomGenerator()));
+        return new UnsignedBigNumber(LogicalUtils.probablePrimeWithOneGCD(nBits, phi.getBits(), new BooleanArrayLinearRandomGenerator()));
     }
 }
 

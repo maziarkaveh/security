@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class LogicalUtils {
+
     public static final String HEX_16_DIGITS_PATTERN = "^[0-9A-Fa-f]{16}$";
     public static final String HEX_PATTERN = "^[0-9A-Fa-f]+$";
     public static final boolean[] ONE = {true};
