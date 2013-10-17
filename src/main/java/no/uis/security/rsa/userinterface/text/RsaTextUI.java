@@ -7,13 +7,11 @@ import org.springframework.stereotype.Service;
 public class RsaTextUI implements UI {
 
 
-
     @Override
     public void rsa() {
 
 
     }
-
 
 
 }

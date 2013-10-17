@@ -2,9 +2,11 @@ package no.uis.security.common.utils;
 
 import no.uis.security.des.service.exceptions.IllegalMethodParameterException;
 import no.uis.security.rsa.service.RandomGenerator;
+import no.uis.security.rsa.service.impl.BooleanArrayLinearRandomGenerator;
 import org.apache.commons.lang.ArrayUtils;
 
 import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -268,8 +270,54 @@ public class LogicalUtils {
         return booleans;
     }
 
-    public static boolean[] modInverseOfTwoPrimeBooleanArrays(final boolean[] num, final boolean[] modulus) {
-        return modPowOfTwoBooleanArrays(num.clone(), subtractOfTwoBooleanArrays(modulus.clone(), TWO), modulus.clone());
+    /*
+    a=fe2f  b=9343
+a=9343  b=6aec
+a=6aec  b=2857
+a=2857  b=1a3e
+a=1a3e  b=e19
+a=e19  b=c25
+a=c25  b=1f4                            
+a=1f4  b=6d
+a=6d  b=40
+a=40  b=2d
+a=2d  b=13
+a=13  b=7
+a=7  b=5
+a=5  b=2
+a=2  b=1
+a=1  b=0
+0=1  1=1 2=0
+0=1  1=0 2=1
+0=1  1=1 2=fffffffe
+0=1  1=fffffffe 2=3
+0=1  1=3 2=fffffff8
+0=1  1=fffffff8 2=13
+0=1  1=13 2=ffffffe5
+0=1  1=ffffffe5 2=2e
+0=1  1=2e 2=ffffff2d
+0=1  1=ffffff2d 2=520
+0=1  1=520 2=fffffa0d
+0=1  1=fffffa0d 2=b13
+0=1  1=b13 2=ffffeefa
+0=1  1=ffffeefa 2=2d1f
+0=1  1=2d1f 2=ffffc1db
+0=1  1=ffffc1db 2=6b44
+     */
+    public static BigInteger booleanArrayToBigInteger(boolean[] num) {
+
+        return new BigInteger(booleanArrayToStringHex(num), 16);
+    }
+
+    public static boolean[] bigIntegerToBooleanArray(BigInteger num) {
+        return hexStringToBooleanArray(num.toString(16));
+    }
+
+
+    public static boolean[] modInverseOfTwoBooleanArrays(final boolean[] num, final boolean[] modulus) {
+
+
+        return bigIntegerToBooleanArray(BigIntegerMathUtils.modInverseOfTwoPrimeBooleanArrays(booleanArrayToBigInteger(num), booleanArrayToBigInteger(modulus)));
     }
 
 
@@ -314,9 +362,9 @@ public class LogicalUtils {
     }
 
     public static boolean[] modOfTwoBooleanArrays(final boolean[] dividend, final boolean[] divisor) {
-        if (true) {
-            return intArrayToBooleanArray(modOfTwoIntegerArrays(booleanArrayToIntArray(dividend), booleanArrayToIntArray(divisor)));
-        }
+//        if (false) {
+//            return intArrayToBooleanArray(modOfTwoIntegerArrays(booleanArrayToIntArray(dividend), booleanArrayToIntArray(divisor)));
+//        }
         boolean[] dv = removeLeftFalsesFromBooleanArray(dividend);
         boolean[] dr = removeLeftFalsesFromBooleanArray(divisor);
         if (compareTwoBooleanArrays(dv, dr) == -1) {
@@ -509,18 +557,36 @@ public class LogicalUtils {
     }
 
     public static boolean[] subtractOfTwoBooleanArrays(final boolean[] num1, final boolean[] num2) {
+        if (compareTwoBooleanArrays(num1, num2) == 0) {
+            return ZERO;
+        }
         boolean[] n1 = num1.clone();
         boolean[] n2 = num2.clone();
+        boolean minusResult = false;
+        if (compareTwoBooleanArrays(num1, num2) == -1) {
+            minusResult = true;
+        }
 
         if (n1.length > n2.length) {
             n2 = ArrayUtils.addAll(new boolean[n1.length - n2.length], n2);
+        }
+        if (n2.length > n1.length) {
+            n1 = ArrayUtils.addAll(new boolean[n2.length - n1.length], n1);
         }
         n2 = complementBooleanArray(n2);
         boolean[] add = addOfTwoBooleanArrays(n1, n2);
 
         boolean[] sub = addOfTwoBooleanArrays(add, ONE);
 
-        return ArrayUtils.subarray(sub, 1, sub.length);
+        boolean[] subarray = ArrayUtils.subarray(sub, 1, sub.length);
+        if (minusResult) {
+            int length = subarray.length;
+            int expectedLength = (length / 8 + 1) * 8;
+            for (int i = length; i < expectedLength; i++) {
+                subarray = ArrayUtils.addAll(new boolean[]{true}, subarray);
+            }
+        }
+        return subarray;
     }
 
     public static int[] subtractOfTwoIntegerArrays(final int[] num1, final int[] num2) {
@@ -912,4 +978,43 @@ public class LogicalUtils {
     }
 
 
+    public static boolean[] probablePrimeWithOneGCD(int nBits, boolean[] value, BooleanArrayLinearRandomGenerator booleanArrayLinearRandomGenerator) {
+
+        for (; ; ) {
+            boolean[] prime = probablePrime(nBits, booleanArrayLinearRandomGenerator);
+            if (compareTwoBooleanArrays(gcdOfTwoBooleanArrays(prime, value), ONE) == 0) {
+                return prime;
+            }
+        }
+    }
+
+    private static boolean[] gcdOfTwoBooleanArrays(boolean[] m, boolean[] n) {
+        if (compareTwoBooleanArrays(m, ZERO) == 0 || compareTwoBooleanArrays(n, ZERO) == 0)
+            return maxOfTwoBooleanArray(m, n);
+        if (!isOddArrayBoolean(m) && !isOddArrayBoolean(n)) {
+            return gcdOfTwoBooleanArrays(shiftRight(m), shiftLeft(shiftRight(n)));
+        }
+        if (!isOddArrayBoolean(m) || !isOddArrayBoolean(n)) {
+
+            boolean[] odd, even;
+            if (!isOddArrayBoolean(m)) {
+                even = m;
+                odd = n;
+            } else {
+                even = n;
+                odd = m;
+            }
+            return gcdOfTwoBooleanArrays(odd, shiftRight(even));
+        }
+        return gcdOfTwoBooleanArrays(subtractOfTwoBooleanArrays(maxOfTwoBooleanArray(m, n), minOfTwoBooleanArray(m, n)), minOfTwoBooleanArray(m, n));
+
+    }
+
+    public static boolean[] maxOfTwoBooleanArray(boolean[] m, boolean[] n) {
+        return compareTwoBooleanArrays(m, n) == 1 ? m : n;
+    }
+
+    public static boolean[] minOfTwoBooleanArray(boolean[] m, boolean[] n) {
+        return compareTwoBooleanArrays(m, n) == -1 ? m : n;
+    }
 }

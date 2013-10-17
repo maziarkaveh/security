@@ -1,7 +1,7 @@
 package no.uis.security.des.model;
 
-import no.uis.security.des.service.exceptions.ServiceValidationException;
 import no.uis.security.common.utils.LogicalUtils;
+import no.uis.security.des.service.exceptions.ServiceValidationException;
 import org.apache.commons.lang.ArrayUtils;
 
 import java.util.Arrays;

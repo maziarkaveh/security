@@ -8,7 +8,6 @@ import no.uis.security.rsa.service.impl.BooleanArrayLinearRandomGenerator;
 import java.util.Arrays;
 
 import static no.uis.security.common.utils.LogicalUtils.*;
-import static no.uis.security.common.utils.LogicalUtils.ZERO;
 
 public class UnsignedBigNumber implements Cloneable {
     public static final UnsignedBigNumber ZERO = new UnsignedBigNumber(LogicalUtils.ZERO);
@@ -57,7 +56,7 @@ public class UnsignedBigNumber implements Cloneable {
     }
 
 
-    private byte[] getByteValue() {
+    public byte[] getBytes() {
         return booleanArrayToByteArray(value.clone());
     }
 
@@ -79,7 +78,7 @@ public class UnsignedBigNumber implements Cloneable {
     }
 
     public UnsignedBigNumber modInverse(UnsignedBigNumber number) {
-        return new UnsignedBigNumber(modInverseOfTwoPrimeBooleanArrays(getValue(), number.getValue()));
+        return new UnsignedBigNumber(modInverseOfTwoBooleanArrays(getValue(), number.getValue()));
     }
 
     public UnsignedBigNumber add(UnsignedBigNumber number) {
@@ -129,7 +128,11 @@ public class UnsignedBigNumber implements Cloneable {
     }
 
     public static UnsignedBigNumber probablePrime(int nBits, RandomGenerator<UnsignedBigNumber> random) {
-        return new UnsignedBigNumber(LogicalUtils.probablePrime(nBits,new BooleanArrayLinearRandomGenerator()));
+        return new UnsignedBigNumber(LogicalUtils.probablePrime(nBits, new BooleanArrayLinearRandomGenerator()));
+    }
+
+    public static UnsignedBigNumber probablePrimeWithOneGCD(int nBits, UnsignedBigNumber phi, RandomGenerator<UnsignedBigNumber> random) {
+        return new UnsignedBigNumber(LogicalUtils.probablePrimeWithOneGCD(nBits,phi.getValue() ,new BooleanArrayLinearRandomGenerator()));
     }
 }
 

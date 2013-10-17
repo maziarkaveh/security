@@ -1,7 +1,6 @@
 package no.uis.security.rsa.service.impl;
 
 import no.uis.security.common.utils.LogicalUtils;
-import no.uis.security.rsa.model.UnsignedBigNumber;
 import no.uis.security.rsa.service.RandomGenerator;
 import org.springframework.stereotype.Service;
 

@@ -1,11 +1,11 @@
 package no.uis.security.des.service.feistel;
 
+import no.uis.security.common.utils.LogicalUtils;
 import no.uis.security.des.model.Block;
 import no.uis.security.des.service.EncryptionService;
 import no.uis.security.des.service.RoundFunction;
 import no.uis.security.des.service.SubKeyGenerator;
 import no.uis.security.des.service.exceptions.ServiceValidationException;
-import no.uis.security.common.utils.LogicalUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

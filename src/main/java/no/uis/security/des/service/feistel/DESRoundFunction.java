@@ -1,9 +1,9 @@
 package no.uis.security.des.service.feistel;
 
-import no.uis.security.des.model.Block;
-import no.uis.security.des.service.RoundFunction;
 import no.uis.security.common.utils.CypherUtils;
 import no.uis.security.common.utils.LogicalUtils;
+import no.uis.security.des.model.Block;
+import no.uis.security.des.service.RoundFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

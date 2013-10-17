@@ -4,6 +4,7 @@ import no.uis.security.rsa.service.impl.BooleanArrayLinearRandomGenerator;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.math.BigInteger;
 import java.security.SecureRandom;
 
 import static no.uis.security.common.utils.LogicalUtils.addOfTwoIntegerArrays;
@@ -207,13 +208,13 @@ public class LogicalUtilsTest {
 
     @Test
     public void modInverseOfTwoBooleanArrays() {
-        BigInteger bigInteger = BigInteger.probablePrime(123, new SecureRandom());
 
 
-        boolean[] n1 = LogicalUtils.hexStringToBooleanArray("4e7452b6755a969c5d8eafe01506395");
-        boolean[] n2 = LogicalUtils.hexStringToBooleanArray("1c7469da219f1c8bab429a489068245e2f069");
-        boolean[] expected = LogicalUtils.hexStringToBooleanArray("1252a4adfab148d536cd04b5b87ff740bfdf6");
-        boolean[] actuals = LogicalUtils.modInverseOfTwoPrimeBooleanArrays(n1, n2);
+        boolean[] n1 = LogicalUtils.hexStringToBooleanArray("46162325BA4DB75895428E3F5");
+        boolean[] n2 = LogicalUtils.hexStringToBooleanArray("77AC2D2636B99748E2F3EB140");
+        boolean[] expected = LogicalUtils.hexStringToBooleanArray("cdb7d13c6885207dc3b3351d");
+
+        boolean[] actuals = LogicalUtils.modInverseOfTwoBooleanArrays(n1, n2);
         assertArrayEquals(expected, actuals);
     }
 
@@ -531,7 +532,9 @@ public class LogicalUtilsTest {
         boolean[] i1 = {true, false, false, true, true, true};
         boolean[] i2 = {true, true, false, true};
         boolean[] e = {true, true, false, true, false};
+        boolean[] e2 = {true, true, true, false, false, true, true, false};
         assertArrayEquals(e, LogicalUtils.subtractOfTwoBooleanArrays(i1, i2));
+        assertArrayEquals(e2, LogicalUtils.subtractOfTwoBooleanArrays(i2, i1));
 
         boolean[] n1 = LogicalUtils.hexStringToBooleanArray("e385217404a2aad5d91061ffccb446ab28ac46a2bb92adbc335bf104b78111e6003aeaedc4");
         boolean[] n2 = LogicalUtils.hexStringToBooleanArray("1");

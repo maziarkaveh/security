@@ -1,8 +1,8 @@
 package no.uis.security.des.service.feistel;
 
+import no.uis.security.common.utils.LogicalUtils;
 import no.uis.security.des.AbstractBasicTest;
 import no.uis.security.des.model.Block;
-import no.uis.security.common.utils.LogicalUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,9 +1,9 @@
 package no.uis.security.des.service.feistel;
 
+import no.uis.security.common.utils.LogicalUtils;
 import no.uis.security.des.AbstractBasicTest;
 import no.uis.security.des.model.Block;
 import no.uis.security.des.service.RoundFunction;
-import no.uis.security.common.utils.LogicalUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -70,6 +70,6 @@ public class DESRoundFunctionTest extends AbstractBasicTest {
         Assert.assertArrayEquals("someTest".getBytes(), inverse.getAllBytes());
         byte[] m = LogicalUtils.hexStringToByteArray("2589649075e8fd8f");
         Block block1 = roundFunction.inverseInit(new Block(m));
-        Assert.assertEquals("da02ce3a89ecac3b", LogicalUtils.byteArrayToStringHex(block1.getAllBytes()));
+        Assert.assertEquals("DA02CE3A89ECAC3B", LogicalUtils.byteArrayToStringHex(block1.getAllBytes()));
     }
 }

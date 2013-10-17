@@ -1,6 +1,5 @@
 package no.uis.security.rsa;
 
-import no.uis.security.rsa.userinterface.UI;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
