@@ -270,40 +270,7 @@ public class LogicalUtils {
         return booleans;
     }
 
-    /*
-    a=fe2f  b=9343
-a=9343  b=6aec
-a=6aec  b=2857
-a=2857  b=1a3e
-a=1a3e  b=e19
-a=e19  b=c25
-a=c25  b=1f4                            
-a=1f4  b=6d
-a=6d  b=40
-a=40  b=2d
-a=2d  b=13
-a=13  b=7
-a=7  b=5
-a=5  b=2
-a=2  b=1
-a=1  b=0
-0=1  1=1 2=0
-0=1  1=0 2=1
-0=1  1=1 2=fffffffe
-0=1  1=fffffffe 2=3
-0=1  1=3 2=fffffff8
-0=1  1=fffffff8 2=13
-0=1  1=13 2=ffffffe5
-0=1  1=ffffffe5 2=2e
-0=1  1=2e 2=ffffff2d
-0=1  1=ffffff2d 2=520
-0=1  1=520 2=fffffa0d
-0=1  1=fffffa0d 2=b13
-0=1  1=b13 2=ffffeefa
-0=1  1=ffffeefa 2=2d1f
-0=1  1=2d1f 2=ffffc1db
-0=1  1=ffffc1db 2=6b44
-     */
+
     public static BigInteger booleanArrayToBigInteger(boolean[] num) {
 
         return new BigInteger(booleanArrayToStringHex(num), 16);
@@ -316,8 +283,33 @@ a=1  b=0
 
     public static boolean[] modInverseOfTwoBooleanArrays(final boolean[] num, final boolean[] modulus) {
 
+        //Todo It should be implemented by boolean array (since - signed was not considered before it is problem to implement now)
+        return bigIntegerToBooleanArray(modInverseOfTwoPrimeBooleanArrays(booleanArrayToBigInteger(num), booleanArrayToBigInteger(modulus)));
+    }
 
-        return bigIntegerToBooleanArray(BigIntegerMathUtils.modInverseOfTwoPrimeBooleanArrays(booleanArrayToBigInteger(num), booleanArrayToBigInteger(modulus)));
+    public static BigInteger[] egcdOfTwoBigIntegers(final BigInteger num1, final BigInteger num2) {
+        BigInteger[] ans = new BigInteger[3];
+        BigInteger q, a = num1, b = num2;
+
+        if (b.compareTo(BigInteger.ZERO) == 0) {
+            ans[0] = a;
+            ans[1] = BigInteger.ONE;
+            ans[2] = BigInteger.ZERO;
+        } else {
+            q = a.divide(b);
+            ans = egcdOfTwoBigIntegers(b, a.mod(b));
+            BigInteger temp = ans[1].subtract(ans[2].multiply(q));
+            ans[1] = ans[2];
+            ans[2] = temp;
+        }
+
+        return ans;
+
+    }
+
+
+    public static BigInteger modInverseOfTwoPrimeBooleanArrays(final BigInteger num, final BigInteger modulus) {
+        return egcdOfTwoBigIntegers(num, modulus)[1].add(modulus).mod(modulus);
     }
 
 
