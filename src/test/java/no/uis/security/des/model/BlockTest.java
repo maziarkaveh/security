@@ -1,6 +1,6 @@
 package no.uis.security.des.model;
 
-import no.uis.security.des.AbstractBasicTest;
+import no.uis.security.common.AbstractBasicTest;
 import no.uis.security.des.service.exceptions.ServiceValidationException;
 import org.junit.Assert;
 import org.junit.Test;

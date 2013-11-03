@@ -1,16 +1,13 @@
 package no.uis.security.rsa.service.impl;
 
 import no.uis.security.common.utils.LogicalUtils;
-import no.uis.security.des.AbstractBasicTest;
+import no.uis.security.common.AbstractBasicTest;
 import no.uis.security.rsa.model.RSAKeys;
 import no.uis.security.rsa.model.UnsignedBigNumber;
 import no.uis.security.rsa.service.EncryptionService;
-import org.apache.commons.lang.ArrayUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.math.BigInteger;
 
 /**
  * Created with IntelliJ IDEA.

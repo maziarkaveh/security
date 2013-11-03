@@ -60,20 +60,16 @@ public class LogicalUtils {
         return hexString.toString().toUpperCase();
     }
 
-    public static String intArrayToStringHex(int[] num) {
+    public static String intArrayToStringHex(int... num) {
         StringBuffer hexString = new StringBuffer();
-
-        for (int i = 0; i < num.length; i++) {
-            String hex = Integer.toHexString(num[i]);
-
-            for (int j = 0; j < 4 - hex.length(); j++) {
-                hexString.append('0');
-            }
-            hexString.append(hex);
+        for (int n : num) {
+            hexString.append(String.format("%08x", n));
         }
         return hexString.toString().toUpperCase();
     }
-
+    public static int rol(int num, int cnt) {
+        return (num << cnt) | (num >>> (32 - cnt));
+    }
     public static String byteArrayToStringBits(byte[] bytes) {
         StringBuffer s = new StringBuffer();
 

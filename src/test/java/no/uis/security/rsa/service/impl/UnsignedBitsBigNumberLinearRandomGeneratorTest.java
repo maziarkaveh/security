@@ -1,6 +1,6 @@
 package no.uis.security.rsa.service.impl;
 
-import no.uis.security.des.AbstractBasicTest;
+import no.uis.security.common.AbstractBasicTest;
 import org.junit.Test;
 
 /**

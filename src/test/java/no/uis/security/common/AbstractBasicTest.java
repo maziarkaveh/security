@@ -1,4 +1,4 @@
-package no.uis.security.des;
+package no.uis.security.common;
 
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
