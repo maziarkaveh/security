@@ -103,7 +103,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>no.uis.security.rsa.MainClass</mainClass>
+                            <mainClass>no.uis.security.dsa.MainClass</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
