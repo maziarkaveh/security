@@ -1,7 +1,7 @@
 package no.uis.security.dsa.repository;
 
 import no.uis.security.common.repository.BasicRepository;
-import no.uis.security.dsa.model.GlobalPublicKey;
+import no.uis.security.dsa.model.Message;
 
 /**
  * Created with IntelliJ IDEA.
@@ -10,6 +10,5 @@ import no.uis.security.dsa.model.GlobalPublicKey;
  * Time: 19:18
  * To change this template use File | Settings | File Templates.
  */
-public interface GlobalPublicKeyRepository extends BasicRepository<GlobalPublicKey,Long> {
-    GlobalPublicKey getLastGlobalPublicKey();
-}
+public interface MessageRepository extends BasicRepository<Message,Long> {
+ }

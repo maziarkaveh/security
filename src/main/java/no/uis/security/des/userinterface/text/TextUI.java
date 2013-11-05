@@ -23,7 +23,7 @@ public class TextUI implements UI {
             byte[] text = getText(action);
             byte[] key = getKey();
             byte[] code = action.equals(Action.DECRYPT_HEX) ? feistelCipher.decrypt(text, key) : feistelCipher.encrypt(text, key);
-            System.out.printf("The %s in Hex is:%s\nAnd in Plain text is %s", action, byteArrayToStringHex(code), byteArrayToString(code));
+            System.out.printf("The %s in Hex is:%s\nAnd in Plain entities is %s", action, byteArrayToStringHex(code), byteArrayToString(code));
         } catch (Exception e) {
             System.err.println("Some error occurred please try again");
             feistel();

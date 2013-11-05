@@ -7,6 +7,9 @@
             <property name="hibernate.hbm2ddl.auto" value="update"/>
         </properties>
         <class>no.uis.security.dsa.model.GlobalPublicKey</class>
+        <class>no.uis.security.dsa.model.User</class>
+        <class>no.uis.security.dsa.model.Message</class>
+        <class>no.uis.security.dsa.model.UserKeys</class>
     </persistence-unit>
 
 </persistence>

@@ -1,13 +1,14 @@
 package no.uis.security.dsa.model;
 
 import no.uis.security.common.model.Entity;
-import org.hibernate.annotations.Type;
+import no.uis.security.common.utils.RandomUtils;
+import org.apache.commons.lang.StringUtils;
 
-import javax.persistence.Column;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Random;
 
 /**
@@ -19,81 +20,101 @@ import java.util.Random;
  */
 @javax.persistence.Entity
 @Table(name = "GlobalPublicKey")
-
+@NamedQueries({
+        @NamedQuery(name = "getLastGlobalPublicKey", query = "from GlobalPublicKey order by generatedDate desc")
+})
 public class GlobalPublicKey extends Entity<Long> {
     @Transient
-
-    private int primeCenterie = 20;
-    @Column
+    private static int primeCenterie = 20;
+    @Column(columnDefinition="varchar2(2000)")
     private String q;
-    @Column
+    @Column(columnDefinition="varchar2(2000)")
     private String p;
-    @Column
+    @Column(columnDefinition="varchar2(2000)")
     private String g;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date generatedDate;
     @Transient
     private static GlobalPublicKey globalPublicKey;
 
+
     private GlobalPublicKey() {
-        BigInteger q, p;
+
+    }
+
+    public GlobalPublicKey(String q, String p, String g) {
+        this.q = q;
+        this.p = p;
+        this.g = g;
+        this.generatedDate = Calendar.getInstance().getTime();
+    }
+
+    public static GlobalPublicKey generateNewInstance() {
+
+        Random rand = new SecureRandom();
+        BigInteger q, p, g;
         q = new BigInteger(160, primeCenterie, rand);
-        p = new BigInteger(160, primeCenterie, rand);;
-        this.g = new BigInteger(160, primeCenterie, rand).toString();
-        this.p = p.toString();
-        this.q = q.toString();
+        p = generateP(q, rand);
+        g = generateG(p, q, rand);
+
+
+        return new GlobalPublicKey(q.toString(), p.toString(), g.toString());
     }
 
-    public static GlobalPublicKey getInstance() {
-        if (globalPublicKey == null) {
-            globalPublicKey = new GlobalPublicKey();
+
+    private static BigInteger generateP(BigInteger q, Random rand) {
+        BigInteger p;
+        if (q == null) {
+            throw new IllegalStateException();
         }
-        return globalPublicKey;
-    }
-
-    @Transient
-    private Random rand = new SecureRandom();
-
-
-    private BigInteger generateP(BigInteger q, int l) {
-        if (l % 64 != 0) {
-            throw new IllegalArgumentException("L value is wrong");
+        int l = 512 + RandomUtils.random(0, 512 / 64) * 64;
+        if (!(l >= 512 && l <= 1024 && l % 64 == 0)) {
+            return generateP(q, rand);
         }
-        BigInteger pTemp;
-        BigInteger pTemp2;
+        BigInteger pMinusOne;
         do {
-            pTemp = new BigInteger(l, primeCenterie, rand);
-            pTemp2 = pTemp.subtract(BigInteger.ONE);
-            pTemp = pTemp.subtract(pTemp2.remainder(q));
-        } while (!pTemp.isProbablePrime(primeCenterie) || pTemp.bitLength() != l);
-        return pTemp;
+            p = new BigInteger(l, rand);
+            pMinusOne = p.subtract(BigInteger.ONE);
+            p = p.add(q.subtract(pMinusOne.mod(q)));
+        } while (p.bitLength() != l || !p.isProbablePrime(primeCenterie));
+        return p;
     }
 
-    private BigInteger generateG(BigInteger p, BigInteger q) {
-        BigInteger aux = p.subtract(BigInteger.ONE);
-        BigInteger pow = aux.divide(q);
-        BigInteger gTemp;
+    private static BigInteger generateG(BigInteger p, BigInteger q, Random rand) {
+
+        BigInteger g = null;
+        BigInteger pMinusOne = p.subtract(BigInteger.ONE);
+        BigInteger pow = pMinusOne.divide(q);
+        BigInteger h;
         do {
-            gTemp = new BigInteger(aux.bitLength(), rand);
-        } while (gTemp.compareTo(aux) != -1 && gTemp.compareTo(BigInteger.ONE) != 1);
-        return gTemp.modPow(pow, p);
+
+            h = new BigInteger(RandomUtils.random(1, pMinusOne.bitLength()), rand).mod(pMinusOne);
+            if (!(h.compareTo(BigInteger.ONE) > 0 && h.compareTo(pMinusOne) < 0)) {
+                continue;
+            }
+            g = h.modPow(pow, p);
+        } while (!(g.compareTo(BigInteger.ONE) > 0));
+        return g;
     }
 
 
     public BigInteger getQ() {
-        return new BigInteger(q);
+        return StringUtils.isEmpty(q) ? null : new BigInteger(q);
     }
 
     public BigInteger getP() {
-        return new BigInteger(p);
+        return StringUtils.isEmpty(p) ? null : new BigInteger(p);
     }
 
     public BigInteger getG() {
-        return new BigInteger(g);
+        return StringUtils.isEmpty(g) ? null : new BigInteger(g);
     }
 
     @Override
     public String toString() {
         return "GlobalPublicKey{" +
-                "q=" + q +
+                "id=" + getId() +
+                ", q=" + q +
                 ", p=" + p +
                 ", g=" + g +
                 '}';

@@ -95,7 +95,7 @@ public class BasicRepositoryJpa<T, PK extends Serializable> implements BasicRepo
         T entity = this.getEntityManager().find(this.persistentClass, id);
         return entity != null;
     }
-    @Transactional
+
     public T store(T object) {
         return this.getEntityManager().merge(object);
     }
@@ -120,10 +120,6 @@ public class BasicRepositoryJpa<T, PK extends Serializable> implements BasicRepo
     }
 
 
-
-
-
-
     /**
      * @param criteria
      * @return
@@ -131,7 +127,7 @@ public class BasicRepositoryJpa<T, PK extends Serializable> implements BasicRepo
     final private List<T> getFinderResult(Criteria criteria) {
         List<T> pojos = new ArrayList<T>();
         for (Object o : criteria.list()) {
-            if (persistentClass.isInstance(o) ) {
+            if (persistentClass.isInstance(o)) {
                 pojos.add((T) o);
             } else if (o instanceof List) {
                 for (Object anObject : (List) o) {
@@ -143,7 +139,6 @@ public class BasicRepositoryJpa<T, PK extends Serializable> implements BasicRepo
         }
         return pojos;
     }
-
 
 
 }

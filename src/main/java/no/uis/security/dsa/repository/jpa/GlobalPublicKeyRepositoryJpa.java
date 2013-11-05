@@ -5,6 +5,8 @@ import no.uis.security.dsa.model.GlobalPublicKey;
 import no.uis.security.dsa.repository.GlobalPublicKeyRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * Created with IntelliJ IDEA.
  * User: maziarkaveh
@@ -16,5 +18,11 @@ import org.springframework.stereotype.Repository;
 public class GlobalPublicKeyRepositoryJpa extends BasicRepositoryJpa<GlobalPublicKey,Long> implements GlobalPublicKeyRepository {
     public GlobalPublicKeyRepositoryJpa() {
         super(GlobalPublicKey.class);
+    }
+
+    @Override
+    public GlobalPublicKey getLastGlobalPublicKey() {
+        List<GlobalPublicKey> getLastGlobalPublicKey = findByNamedQuery("getLastGlobalPublicKey");
+        return getLastGlobalPublicKey.isEmpty()?null:getLastGlobalPublicKey.get(0);
     }
 }

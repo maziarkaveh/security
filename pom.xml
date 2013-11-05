@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>no.uis.security</groupId>
-    <artifactId>security-assigment-2</artifactId>
-    <version>2.0</version>
+    <artifactId>security-assigment-3</artifactId>
+    <version>3.0</version>
     <build>
 
         <plugins>
@@ -48,6 +48,44 @@
                     </dependency>
 
                 </dependencies>
+            </plugin>-->
+          <!--  <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>aspectj-maven-plugin</artifactId>
+                <version>1.5</version>
+
+                <dependencies>
+                    <dependency>
+                        <groupId>org.aspectj</groupId>
+                        <artifactId>aspectjrt</artifactId>
+                        <version>${aspectj.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.aspectj</groupId>
+                        <artifactId>aspectjtools</artifactId>
+                        <version>${aspectj.version}</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <complianceLevel>1.7</complianceLevel>
+                    <verbose>true</verbose>
+                    <showWeaveInfo>true</showWeaveInfo>
+                    <aspectLibraries>
+                        <aspectLibrary>
+                            <groupId>org.springframework</groupId>
+                            <artifactId>spring-aspects</artifactId>
+                        </aspectLibrary>
+                    </aspectLibraries>
+
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>compile</goal>
+                            <goal>test-compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -168,12 +206,22 @@
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
+            <artifactId>spring-context-support</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
             <artifactId>spring-orm</artifactId>
             <version>${spring.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-aop</artifactId>
             <version>${spring.version}</version>
         </dependency>
         <dependency>
@@ -243,9 +291,9 @@
                 <jdbc.artifactId>h2</jdbc.artifactId>
                 <jdbc.version>${h2.version}</jdbc.version>
                 <jdbc.driverClassName>org.h2.Driver</jdbc.driverClassName>
-                <jdbc.url>jdbc:h2:~/dsa</jdbc.url>
+                <jdbc.url>jdbc:h2:~/dsaa</jdbc.url>
                 <jdbc.username>sa</jdbc.username>
-                <jdbc.password>sa</jdbc.password>
+                <jdbc.password></jdbc.password>
             </properties>
             <dependencies>
                 <dependency>

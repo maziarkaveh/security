@@ -57,7 +57,7 @@ public class FeistelCipher implements EncryptionService {
 
     @Override
     public byte[] encrypt(byte[] plain, byte[] key) {
-        log.debug("plain text ={}", LogicalUtils.byteArrayToStringHex(plain));
+        log.debug("plain entities ={}", LogicalUtils.byteArrayToStringHex(plain));
         log.debug("plain key ={}", LogicalUtils.byteArrayToStringHex(key));
         Block[] keys = generateKeys(key);
         List<Byte> wholeCypher = new ArrayList<Byte>();
@@ -77,7 +77,7 @@ public class FeistelCipher implements EncryptionService {
 
     @Override
     public byte[] decrypt(byte[] cypher, byte[] key) {
-        log.debug("cypher text ={}", LogicalUtils.byteArrayToStringHex(cypher));
+        log.debug("cypher entities ={}", LogicalUtils.byteArrayToStringHex(cypher));
         log.debug("cypher key ={}", LogicalUtils.byteArrayToStringHex(key));
 
         Block[] keys = generateKeys(key);
@@ -88,7 +88,7 @@ public class FeistelCipher implements EncryptionService {
             wholeCypher.addAll(Arrays.asList(ArrayUtils.toObject(block.getAllBytes())));
         }
         byte[] all = ArrayUtils.toPrimitive(wholeCypher.toArray(new Byte[0]));
-        log.debug("plain text={}", LogicalUtils.byteArrayToStringHex(all));
+        log.debug("plain entities={}", LogicalUtils.byteArrayToStringHex(all));
         return all;
     }
 

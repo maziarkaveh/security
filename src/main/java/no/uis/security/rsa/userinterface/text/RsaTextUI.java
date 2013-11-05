@@ -34,7 +34,7 @@ public class RsaTextUI implements UI {
                 byte[] key = getKey();
                 byte[] modulus = getModulus();
                 byte[] code = action.equals(Action.DECRYPT_HEX) ? rsaEncryptionService.decrypt(text, key, modulus) : rsaEncryptionService.encrypt(text, key, modulus);
-                System.out.printf("The %s in Hex is:%s\nAnd in Plain text is %s", action, byteArrayToStringHex(code), byteArrayToString(code));
+                System.out.printf("The %s in Hex is:%s\nAnd in Plain entities is %s", action, byteArrayToStringHex(code), byteArrayToString(code));
             } catch (Exception e) {
                 if (action == null) {
                     break;
